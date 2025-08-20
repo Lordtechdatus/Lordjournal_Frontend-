@@ -27,6 +27,11 @@ const styles = `
   display: flex;
   align-items: center;
   gap: 10px;
+  transition: opacity 0.2s ease;
+}
+
+.logo-section:hover {
+  opacity: 0.8;
 }
 
 .logo-image {
@@ -238,7 +243,7 @@ const styles = `
 }
 `;
 
-function Header() {
+function Header({ onNavigate, currentPage }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -279,13 +284,10 @@ function Header() {
   }, []);
 
   const handleLogin = useCallback(() => {
-    try {
-      localStorage.setItem('isLoggedIn', 'true');
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.warn('Error setting localStorage:', error);
+    if (onNavigate) {
+      onNavigate('login');
     }
-  }, []);
+  }, [onNavigate]);
 
   const toggleMobileMenu = useCallback(() => {
     setMobileMenuOpen(prev => !prev);
@@ -339,7 +341,7 @@ function Header() {
     return (
       <header className="header">
         <div className="header-container">
-          <div className="logo-section">
+          <div className="logo-section" onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>
             <div className="logo-placeholder">LJ</div>
             <h1 className="logo-text">Lord Journals</h1>
           </div>
@@ -352,7 +354,7 @@ function Header() {
     <header className="header">
       <div className="header-container">
         {/* Logo */}
-        <div className="logo-section">
+        <div className="logo-section" onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>
           <div className="logo-placeholder">LJ</div>
           <h1 className="logo-text">Lord Journals</h1>
         </div>

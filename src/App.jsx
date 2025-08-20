@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "./Header";
 import Homepage from "./Homepage";
+import LoginPage from "./LoginPage";
 import Footer from "./Footer";
 import CookieConsent from "./CookieConsent";
 
@@ -97,6 +98,8 @@ const styles = `
 `;
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+
   // Inject App.css styles once
   useEffect(() => {
     if (!document.getElementById(APP_STYLE_ID)) {
@@ -108,10 +111,25 @@ function App() {
     }
   }, []);
 
+  // Simple navigation function
+  const navigateTo = (page) => {
+    setCurrentPage(page);
+  };
+
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case 'login':
+        return <LoginPage onNavigate={navigateTo} />;
+      case 'home':
+      default:
+        return <Homepage />;
+    }
+  };
+
   return (
     <>
-      <Header />
-      <Homepage />
+      <Header onNavigate={navigateTo} currentPage={currentPage} />
+      {renderCurrentPage()}
       <Footer />
       <CookieConsent />
     </>
