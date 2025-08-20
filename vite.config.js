@@ -10,7 +10,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor': ['react', 'react-dom'],
-          'app': ['./src/App.jsx', './src/Header.jsx', './src/Hero.jsx', './src/Footer.jsx'],
+          'app': ['./src/App.jsx', './src/Header.jsx', './src/Homepage.jsx', './src/Footer.jsx'],
         }
       }
     },

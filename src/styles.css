@@ -1,9 +1,4 @@
-/* Import all component styles */
-@import './App.css';
-@import './Header.css';
-@import './Hero.css';
-@import './Footer.css';
-@import './CookieConsent.css';
+/* All component styles are now inlined in their respective components */
 
 /* Global styles to ensure immediate rendering */
 body {
