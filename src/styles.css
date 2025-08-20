@@ -1,0 +1,42 @@
+/* Import all component styles */
+@import './App.css';
+@import './Header.css';
+@import './Hero.css';
+@import './Footer.css';
+@import './CookieConsent.css';
+
+/* Global styles to ensure immediate rendering */
+body {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Prevent FOUC (Flash of Unstyled Content) */
+.js-loading * {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -ms-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
+}
+
+/* Preload critical elements to prevent layout shifts */
+.header,
+.hero-section,
+.footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto;
+}
+
+/* Improve rendering performance */
+* {
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent layout shifts */
+html {
+  scroll-behavior: smooth;
+}
+
