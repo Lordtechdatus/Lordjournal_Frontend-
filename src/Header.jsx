@@ -125,7 +125,8 @@ const styles = `
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  left: 100%;
+  left: 80%;
+  text-align: left;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -136,7 +137,6 @@ const styles = `
   visibility: hidden;
   transform: translateY(8px);
   transition: all 0.2s ease;
-  margin-top: 5px;
 }
 
 .dropdown-menu.open {
@@ -150,6 +150,7 @@ const styles = `
   padding: 10px 16px;
   color: #213547;
   text-decoration: none;
+  text-align: left;
   font-size: 14px;
   transition: background-color 0.2s;
   border-bottom: 1px solid #f5f5f5;

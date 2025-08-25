@@ -11,6 +11,7 @@ import DatabasesPage from "./DatabasesPage";
 import PlatformsPage from "./PlatformsPage";
 
 
+
 const APP_STYLE_ID = "app-inline-style";
 
 const styles = `
