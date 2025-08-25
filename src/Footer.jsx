@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const FOOTER_STYLE_ID = "footer-inline-styles";
 const styles = `
@@ -120,10 +121,10 @@ export default function Footer() {
         <div className="footer-column">
           <h4>Products</h4>
           <ul className="footer-list">
-            <li>Journals</li>
-            <li>Books</li>
-            <li>Platforms</li>
-            <li>Databases</li>
+            <li><Link to="/journals" style={{ color: 'inherit', textDecoration: 'none' }}>Journals</Link></li>
+              <li><Link to="/books" style={{ color: 'inherit', textDecoration: 'none' }}>Books</Link></li>
+              <li><Link to="/platforms" style={{ color: 'inherit', textDecoration: 'none' }}>Platforms</Link></li>
+              <li><Link to="/databases" style={{ color: 'inherit', textDecoration: 'none' }}>Databases</Link></li>
           </ul>
         </div>
 
@@ -131,7 +132,7 @@ export default function Footer() {
         <div className="footer-column">
           <h4>Researchers &amp; Partners</h4>
           <ul className="footer-list">
-            <li>Authors</li>
+            <li><Link to="/authors" style={{ color: 'inherit', textDecoration: 'none' }}>Authors</Link></li>
             <li>Editors</li>
             <li>Open science</li>
             <li>Societies</li>

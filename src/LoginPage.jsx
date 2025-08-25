@@ -221,33 +221,33 @@ function LoginPage({ onNavigate }) {
           </button>
           <p className="or-divider">OR</p>
           <button className="signup-button">Sign up with Email</button>
-        </div>
+          </div>
 
         <form onSubmit={handleSubmit} className="login-column">
           <h3>Email Login</h3>
-          <input
-            type="email"
-            placeholder="Your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            <input
+              type="email"
+              placeholder="Your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             className="login-input"
             autoComplete="email"
-          />
-          <input
-            type="password"
-            placeholder="Your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            />
+            <input
+              type="password"
+              placeholder="Your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             className="login-input"
             autoComplete="current-password"
-          />
+            />
           <button type="submit" className="login-button">Login</button>
           <p className="forgot-link">Forgot password?</p>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
   );
 }
 

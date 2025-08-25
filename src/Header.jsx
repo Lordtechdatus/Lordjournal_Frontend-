@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 
 const HEADER_STYLE_ID = 'header-inline-styles';
 const styles = `
@@ -89,6 +90,7 @@ const styles = `
   position: relative;
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
 .nav-link-dropdown {
@@ -122,18 +124,19 @@ const styles = `
 
 .dropdown-menu {
   position: absolute;
-  top: calc(100% - 2px);
-  left: 0;
+  top: 100%;
+  left: 100%;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 250px;
+  min-width: 280px;
   z-index: 1001;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
+  transform: translateY(8px);
   transition: all 0.2s ease;
+  margin-top: 5px;
 }
 
 .dropdown-menu.open {
@@ -144,12 +147,15 @@ const styles = `
 
 .dropdown-item {
   display: block;
-  padding: 12px 16px;
+  padding: 10px 16px;
   color: #213547;
   text-decoration: none;
   font-size: 14px;
   transition: background-color 0.2s;
   border-bottom: 1px solid #f5f5f5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dropdown-item:last-child {
@@ -341,10 +347,10 @@ function Header({ onNavigate, currentPage }) {
     return (
       <header className="header">
         <div className="header-container">
-          <div className="logo-section" onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>
+          <Link to="/" className="logo-section" style={{ textDecoration: 'none' }}>
             <div className="logo-placeholder">LJ</div>
             <h1 className="logo-text">Lord Journals</h1>
-          </div>
+          </Link>
         </div>
       </header>
     );
@@ -354,10 +360,10 @@ function Header({ onNavigate, currentPage }) {
     <header className="header">
       <div className="header-container">
         {/* Logo */}
-        <div className="logo-section" onClick={() => onNavigate && onNavigate('home')} style={{ cursor: 'pointer' }}>
+        <Link to="/" className="logo-section" style={{ textDecoration: 'none' }}>
           <div className="logo-placeholder">LJ</div>
           <h1 className="logo-text">Lord Journals</h1>
-        </div>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="nav-menu" aria-label="Primary">
@@ -380,17 +386,16 @@ function Header({ onNavigate, currentPage }) {
                     onMouseLeave={() => setDropdownOpen(false)}
                   >
                     {journalCategories.map((journal, jIdx) => (
-                      <a
-                        key={`journal-${jIdx}`}
-                        href="#"
-                        className="dropdown-item"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          closeDropdown();
-                        }}
+                                             <Link
+                         key={`journal-${jIdx}`}
+                         to={journal === 'Lord Journal of Civil Engineering' ? '/journals/civil-engineering' : '#'}
+                         className="dropdown-item"
+                         onClick={() => {
+                           closeDropdown();
+                         }}
                       >
                         {journal}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 </>
