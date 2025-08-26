@@ -4,6 +4,14 @@ import Layout from "./components/Layout";
 import Homepage from "./Homepage";
 import LoginPage from "./LoginPage";
 import CivilEngineeringJournal from "./CivilEngineeringJournal";
+import MechanicalEngineeringJournal from "./MechanicalEngineeringJournal";
+import ElectronicsEngineeringJournal from "./ElectronicsEngineeringJournal";
+import ElectricalEngineeringJournal from "./ElectricalEngineeringJournal";
+import ComputerScienceEngineeringJournal from "./ComputerScienceEngineeringJournal";
+import AppliedScienceJournal from "./AppliedScienceJournal";
+import AIMLDSJournal from "./AIMLDSJournal";
+import LawSocialScienceJournal from "./LawSocialScienceJournal";
+import EducationJournal from "./EducationJournal";
 import Footer from "./Footer";
 import JournalsPage from "./JournalsPage";
 import BooksPage from "./BooksPage";
@@ -68,6 +76,46 @@ function App() {
       <Route path="/journals/civil-engineering" element={
         <Layout currentPage={currentPage} onNavigate={navigateTo}>
           <CivilEngineeringJournal />
+        </Layout>
+      } />
+      <Route path="/journals/mechanical-engineering" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <MechanicalEngineeringJournal />
+        </Layout>
+      } />
+      <Route path="/journals/electronics-engineering" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <ElectronicsEngineeringJournal />
+        </Layout>
+      } />
+      <Route path="/journals/electrical-engineering" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <ElectricalEngineeringJournal />
+        </Layout>
+      } />
+      <Route path="/journals/computer-science-engineering" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <ComputerScienceEngineeringJournal />
+        </Layout>
+      } />
+      <Route path="/journals/applied-science" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <AppliedScienceJournal />
+        </Layout>
+      } />
+      <Route path="/journals/ai-ml-data-science" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <AIMLDSJournal />
+        </Layout>
+      } />
+      <Route path="/journals/law-social-science" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <LawSocialScienceJournal />
+        </Layout>
+      } />
+      <Route path="/journals/education" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <EducationJournal />
         </Layout>
       } />
       <Route path="/footer" element={

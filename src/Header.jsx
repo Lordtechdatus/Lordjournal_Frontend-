@@ -328,7 +328,7 @@ function Header({ onNavigate, currentPage }) {
   const journalCategories = [
     'Lord Journal of Civil Engineering',
     'Lord Journal of Mechanical Engineering',
-    'Lord Journal of Electronics',
+    'Lord Journal of Electronics Engineering',
     'Lord Journal of Electrical Engineering',
     'Lord Journal of Computer Science & Engineering (CSE)',
     'Lord Journal of Applied Science',
@@ -386,18 +386,28 @@ function Header({ onNavigate, currentPage }) {
                     onMouseEnter={() => setDropdownOpen(true)}
                     onMouseLeave={() => setDropdownOpen(false)}
                   >
-                    {journalCategories.map((journal, jIdx) => (
-                                             <Link
-                         key={`journal-${jIdx}`}
-                         to={journal === 'Lord Journal of Civil Engineering' ? '/journals/civil-engineering' : '#'}
-                         className="dropdown-item"
-                         onClick={() => {
-                           closeDropdown();
-                         }}
-                      >
-                        {journal}
-                      </Link>
-                    ))}
+                    {journalCategories.map((journal, jIdx) => {
+                      let to = '#';
+                      if (journal === 'Lord Journal of Civil Engineering') to = '/journals/civil-engineering';
+                      if (journal === 'Lord Journal of Mechanical Engineering') to = '/journals/mechanical-engineering';
+                      if (journal === 'Lord Journal of Electronics') to = '/journals/electronics-engineering';
+                      if (journal === 'Lord Journal of Electrical Engineering') to = '/journals/electrical-engineering';
+                      if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/journals/computer-science-engineering';
+                      if (journal === 'Lord Journal of Applied Science') to = '/journals/applied-science';
+                      if (journal === 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science') to = '/journals/ai-ml-data-science';
+                      if (journal === 'Lord Journal of Law & Social Science') to = '/journals/law-social-science';
+                      if (journal === 'Lord Journal of Education') to = '/journals/education';
+                      return (
+                        <Link
+                          key={`journal-${jIdx}`}
+                          to={to}
+                          className="dropdown-item"
+                          onClick={() => { closeDropdown(); }}
+                        >
+                          {journal}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </>
               ) : (
@@ -461,19 +471,28 @@ function Header({ onNavigate, currentPage }) {
                   </div>
                   {mobileDropdownOpen && (
                     <div className="mobile-dropdown">
-                      {journalCategories.map((journal, jIdx) => (
-                        <a
-                          key={`mobile-journal-${jIdx}`}
-                          href="#"
-                          className="mobile-dropdown-item"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            closeMobileMenu();
-                          }}
-                        >
-                          {journal}
-                        </a>
-                      ))}
+                      {journalCategories.map((journal, jIdx) => {
+                        let to = '#';
+                        if (journal === 'Lord Journal of Civil Engineering') to = '/journals/civil-engineering';
+                        if (journal === 'Lord Journal of Mechanical Engineering') to = '/journals/mechanical-engineering';
+                        if (journal === 'Lord Journal of Electronics') to = '/journals/electronics-engineering';
+                        if (journal === 'Lord Journal of Electrical Engineering') to = '/journals/electrical-engineering';
+                        if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/journals/computer-science-engineering';
+                        if (journal === 'Lord Journal of Applied Science') to = '/journals/applied-science';
+                        if (journal === 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science') to = '/journals/ai-ml-data-science';
+                        if (journal === 'Lord Journal of Law & Social Science') to = '/journals/law-social-science';
+                        if (journal === 'Lord Journal of Education') to = '/journals/education';
+                        return (
+                          <Link
+                            key={`mobile-journal-${jIdx}`}
+                            to={to}
+                            className="mobile-dropdown-item"
+                            onClick={() => { closeMobileMenu(); }}
+                          >
+                            {journal}
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </>

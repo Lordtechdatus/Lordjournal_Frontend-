@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const HOMEPAGE_STYLE_ID = 'homepage-inline-styles';
 
@@ -109,6 +110,39 @@ html {
   animation: fadeInUp 1s ease 0.9s forwards;
   transition: all 0.4s ease;
   border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.search-results {
+  max-width: 750px;
+  margin: 0.5rem auto 0;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.search-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: #1a1a1a;
+  transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+  background: #f7fafc;
+}
+
+.search-result-title {
+  font-weight: 600;
+}
+
+.search-result-link {
+  color: #0052cc;
+  font-weight: 600;
 }
 
 .search-container:hover {
@@ -357,15 +391,12 @@ html {
   color: #666;
   font-size: 0.95rem;
   line-height: 1.5;
-  opacity: 0;
-  transform: translateY(10px);
+  opacity: 1;
+  transform: none;
   transition: all 0.3s ease;
 }
 
-.card-item:hover .card-description {
-  opacity: 1;
-  transform: translateY(0);
-}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -527,6 +558,32 @@ function Homepage() {
 
 function HeroSection() {
   const [searchValue, setSearchValue] = useState('');
+  const [results, setResults] = useState([]);
+
+  const journals = [
+    { title: 'Lord Journal of Civil Engineering', route: '/journals/civil-engineering', keywords: ['civil', 'ljce', 'infrastructure'] },
+    { title: 'Lord Journal of Mechanical Engineering', route: '/journals/mechanical-engineering', keywords: ['mechanical', 'ljme', 'manufacturing'] },
+    { title: 'Lord Journal of Electronics', route: '/journals/electronics-engineering', keywords: ['electronics', 'ljee', 'embedded', 'vlsi', 'iot'] },
+    { title: 'Lord Journal of Electrical Engineering', route: '/journals/electrical-engineering', keywords: ['electrical', 'power', 'grids', 'machines'] },
+    { title: 'Lord Journal of Computer Science & Engineering (CSE)', route: '/journals/computer-science-engineering', keywords: ['computer', 'cse', 'software', 'networks', 'ai'] },
+    { title: 'Lord Journal of Applied Science', route: '/journals/applied-science', keywords: ['applied', 'physics', 'chemistry', 'materials'] },
+    { title: 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science', route: '/journals/ai-ml-data-science', keywords: ['ai', 'ml', 'data', 'aimlds', 'nlp', 'vision'] },
+    { title: 'Lord Journal of Law & Social Science', route: '/journals/law-social-science', keywords: ['law', 'social', 'justice', 'policy'] },
+    { title: 'Lord Journal of Education', route: '/journals/education', keywords: ['education', 'learning', 'edtech'] },
+  ];
+
+  useEffect(() => {
+    const q = searchValue.trim().toLowerCase();
+    if (!q) {
+      setResults([]);
+      return;
+    }
+    const matches = journals.filter(j => {
+      const hay = `${j.title} ${j.keywords.join(' ')}`.toLowerCase();
+      return hay.includes(q);
+    }).slice(0, 8);
+    setResults(matches);
+  }, [searchValue]);
 
   return (
    <section className="hero-section">
@@ -548,6 +605,16 @@ function HeroSection() {
             🔍 Search
           </button>
         </div>
+        {results.length > 0 && (
+          <div className="search-results">
+            {results.map((r, idx) => (
+              <Link key={idx} to={r.route} className="search-result-item">
+                <span className="search-result-title">{r.title}</span>
+                <span className="search-result-link">Open →</span>
+              </Link>
+            ))}
+          </div>
+        )}
         <a href="#services" className="advanced-search">
           Advanced search options →
         </a>

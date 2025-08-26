@@ -362,11 +362,8 @@ export default function CivilEngineeringJournal() {
           >
             Editorial Board
           </a>
-          <Link to="/submit" className="nav-link">
+          <Link to="/Login" className="nav-link">
             Submit Paper
-          </Link>
-          <Link to="/login" className="nav-link">
-            Login
           </Link>
         </div>
       </nav>
