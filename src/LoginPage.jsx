@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const LOGIN_STYLE_ID = 'login-inline-styles';
 
@@ -206,9 +207,9 @@ function LoginPage({ onNavigate }) {
 
   return (
     <div className="login-container">
-      <button className="back-button" onClick={handleBack}>
+      <Link className="back-button" onClick={handleBack} to="/">
         ← Back to Home
-      </button>
+      </Link>
       
       <h1 className="login-brand">Lord Journal <span style={{ fontWeight: 400 }}>Login</span></h1>
       <p className="login-subtitle">Access research faster and smarter</p>

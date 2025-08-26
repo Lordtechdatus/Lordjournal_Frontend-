@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const HEADER_STYLE_ID = 'header-inline-styles';
 const styles = `
@@ -256,6 +256,7 @@ function Header({ onNavigate, currentPage }) {
   const [isLoading, setIsLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   // Inject styles once
   useEffect(() => {
@@ -291,10 +292,10 @@ function Header({ onNavigate, currentPage }) {
   }, []);
 
   const handleLogin = useCallback(() => {
-    if (onNavigate) {
-      onNavigate('login');
-    }
-  }, [onNavigate]);
+    navigate('/login');
+    setMobileMenuOpen(false);
+    setDropdownOpen(false);
+  }, [navigate]);
 
   const toggleMobileMenu = useCallback(() => {
     setMobileMenuOpen(prev => !prev);
