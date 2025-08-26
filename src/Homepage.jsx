@@ -24,7 +24,7 @@ html {
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .hero-section::before {
@@ -114,12 +114,14 @@ html {
 
 .search-results {
   max-width: 750px;
+  width: 100%;
   margin: 0.5rem auto 0;
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   border: 1px solid #eee;
+  box-sizing: border-box;
 }
 
 .search-result-item {
@@ -414,6 +416,12 @@ html {
     padding: 1.5rem;
   }
 
+  .search-results {
+    width: calc(100% - 30px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .search-input {
     width: 100%;
     padding: 1.2rem;
@@ -448,6 +456,12 @@ html {
 
   .hero-subtitle {
     font-size: 1rem;
+  }
+
+  .search-results {
+    width: calc(100% - 20px);
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .card-section {

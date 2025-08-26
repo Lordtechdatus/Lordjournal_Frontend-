@@ -130,7 +130,16 @@ export default function CivilEngineeringJournal() {
           font-size: clamp(1rem, 2vw, 1.2rem);
           opacity: 0.9;
           max-width: 800px;
+          margin: 0 auto 0.5rem;
+          font-weight: 600;
+        }
+
+        .journal-description {
+          font-size: clamp(0.9rem, 1.8vw, 1rem);
+          opacity: 0.8;
+          max-width: 800px;
           margin: 0 auto;
+          line-height: 1.4;
         }
 
         .journal-nav {
@@ -316,26 +325,224 @@ export default function CivilEngineeringJournal() {
           transform: translateY(-2px);
         }
 
+        @media (max-width: 1024px) {
+          .main-content {
+            padding: 0 1.5rem;
+          }
+          
+          .scope-grid {
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+          }
+          
+          .editorial-board {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+          }
+        }
+
         @media (max-width: 768px) {
+          .journal-page {
+            font-size: 14px;
+          }
+
           .journal-header {
-            padding: 30px 15px;
+            padding: 20px 15px 15px;
+            margin-top: 0;
+          }
+
+          .journal-title {
+            font-size: 2rem !important;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+          }
+
+          .journal-subtitle {
+            font-size: 1rem !important;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+          }
+
+          .journal-description {
+            font-size: 0.8rem !important;
+            line-height: 1.3;
+          }
+
+          .journal-nav {
+            padding: 0.75rem 0;
+            position: relative;
+            top: 0;
           }
 
           .nav-container {
-            flex-wrap: wrap;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 15px;
+            align-items: stretch;
           }
 
           .nav-link {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+          }
+
+          .main-content {
+            margin: 1rem auto;
+            padding: 0 15px;
+            max-width: 100%;
+          }
+
+          .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.875rem;
+            text-align: center;
+          }
+
+          .section-paragraph {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            text-align: justify;
+          }
+
+          .scope-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+          }
+
+          .scope-item {
+            padding: 0.75rem;
+          }
+
+          .scope-title {
+            font-size: 0.9rem;
+            margin-bottom: 0.375rem;
+          }
+
+          .scope-description {
+            font-size: 0.8rem;
+            line-height: 1.4;
+          }
+
+          .editorial-board {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+          }
+
+          .editor-card {
+            padding: 1rem;
+            text-align: center;
+          }
+
+          .editor-name {
+            font-size: 1rem;
+          }
+
+          .editor-role {
+            font-size: 0.8rem;
+          }
+
+          .editor-affiliation {
+            font-size: 0.8rem;
+          }
+
+          .submit-button {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.85rem;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .journal-page {
+            font-size: 13px;
+          }
+
+          .journal-header {
+            padding: 15px 10px 10px;
+          }
+
+          .journal-title {
+            font-size: 1.8rem !important;
+            margin-bottom: 1.5rem;
+          }
+
+          .journal-subtitle {
+            font-size: 0.9rem !important;
+            line-height: 1.2;
+            margin-bottom: 0.375rem;
+          }
+
+          .journal-description {
+            font-size: 0.75rem !important;
+            line-height: 1.2;
+          }
+
+          .nav-container {
+            padding: 0 10px;
+            gap: 0.375rem;
+          }
+
+          .nav-link {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.6rem;
+          }
+
+          .main-content {
+            padding: 0 10px;
+            margin: 0.75rem auto;
+          }
+
+          .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+          }
+
+          .section-paragraph {
+            font-size: 0.8rem;
+            line-height: 1.4;
+          }
+
+          .scope-item {
+            padding: 0.6rem;
+          }
+
+          .scope-title {
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+          }
+
+          .scope-description {
+            font-size: 0.75rem;
+            line-height: 1.3;
+          }
+
+          .editor-card {
+            padding: 0.75rem;
+          }
+
+          .editor-name {
             font-size: 0.9rem;
           }
 
-          .metric-card {
-            padding: 1rem;
+          .editor-role {
+            font-size: 0.75rem;
           }
 
-          .metric-value {
-            font-size: 1.5rem;
+          .editor-affiliation {
+            font-size: 0.75rem;
+          }
+
+          .submit-button {
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            margin-top: 1rem;
           }
         }
       `;
@@ -346,8 +553,9 @@ export default function CivilEngineeringJournal() {
   return (
     <div className="journal-page">
       <header className="journal-header">
-        <h1 className="journal-title">Lord Journal of Civil Engineering (LJCE)</h1>
-        <p className="journal-subtitle">A peer-reviewed, open-access international journal by Lord-Tech Datus Sol Pvt. Ltd.</p>
+        <h1 className="journal-title">LJCE</h1>
+        <p className="journal-subtitle">Lord Journal of Civil Engineering</p>
+        <p className="journal-description">A peer-reviewed, open-access international journal by Lord-Tech Datus Sol Pvt. Ltd.</p>
       </header>
 
       <nav className="journal-nav">
