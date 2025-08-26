@@ -5,58 +5,86 @@ export default function CivilEngineeringJournal() {
   const [activeTab, setActiveTab] = useState('home');
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Mock data for the journal
+  // Journal content
   const journalInfo = {
-    metrics: {
-      impactFactor: "3.8",
-      acceptanceRate: "32%",
-      reviewTime: "45 days",
-      publicationTime: "60 days"
-    },
-    editorialBoard: [
+    about: [
+      "The Lord Journal of Civil Engineering (LJCE) is a peer-reviewed, open-access international journal published by Lord-Tech Datus Sol Pvt. Ltd.. It is dedicated to advancing the understanding, development, and application of civil engineering principles in both academic and practical contexts.",
+      "Our mission is to provide a platform for researchers, academicians, industry professionals, and policymakers to share groundbreaking research, innovative technologies, and best practices that drive progress in infrastructure, sustainability, and resilient systems.",
+      "The journal is committed to academic integrity, global accessibility, and the highest standards of editorial and peer-review practices. LJCE serves as a conduit for knowledge exchange between diverse regions and engineering disciplines, addressing the evolving challenges of the modern built environment."
+    ],
+    aimAndScopeIntro: [
+      "The Lord Journal of Civil Engineering (LJCE) aims to foster innovation and academic excellence by publishing high-quality, original contributions that promote advancement in all major domains of civil engineering.",
+      "LJCE invites submissions that are theoretical, experimental, computational, or practical in nature, with a strong emphasis on interdisciplinary research and solutions that support sustainable development."
+    ],
+    scope: [
       {
-        name: "Prof. Sarah Johnson",
-        role: "Editor-in-Chief",
-        affiliation: "Stanford University, USA",
-        expertise: "Structural Engineering"
+        title: "Structural Engineering",
+        description: "Structural analysis, innovative design methods, high-performance materials, and earthquake-resistant structures."
       },
       {
-        name: "Dr. Michael Chen",
-        role: "Associate Editor",
-        affiliation: "MIT, USA",
-        expertise: "Geotechnical Engineering"
+        title: "Geotechnical Engineering",
+        description: "Foundation engineering, soil dynamics, ground improvement, and geosynthetics."
       },
       {
-        name: "Prof. Emma Williams",
-        role: "Associate Editor",
-        affiliation: "Imperial College London, UK",
-        expertise: "Construction Management"
+        title: "Environmental Engineering",
+        description: "Water and wastewater treatment, pollution control, waste management, and sustainable environmental technologies."
       },
       {
-        name: "Dr. Rajesh Patel",
-        role: "Associate Editor",
-        affiliation: "IIT Delhi, India",
-        expertise: "Transportation Engineering"
+        title: "Transportation Engineering",
+        description: "Traffic systems, pavement materials, transport planning, intelligent transportation systems (ITS), and urban mobility."
+      },
+      {
+        title: "Water Resources and Hydraulic Engineering",
+        description: "Hydrology, stormwater management, irrigation engineering, hydraulic structures, and climate resilience in water systems."
+      },
+      {
+        title: "Construction Engineering and Materials",
+        description: "Emerging construction technologies, material innovations, sustainability in construction, and lifecycle analysis."
+      },
+      {
+        title: "Earthquake and Disaster Engineering",
+        description: "Seismic risk assessment, disaster mitigation strategies, resilient infrastructure, and recovery planning."
+      },
+      {
+        title: "Smart and Sustainable Infrastructure",
+        description: "Digital construction, smart cities, Building Information Modeling (BIM), IoT integration, and sustainable urban development."
       }
     ],
-    recentArticles: [
+    editorialBoard: [
       {
-        title: "Sustainable Materials in Modern Construction: A Comprehensive Review",
-        authors: "Smith et al.",
-        date: "2024",
-        citations: 45
+        name: "Dr. Manoj Kumar Trivedi",
+        role: "Editor-in-Chief",
+        affiliation: "MITS-DU, Gwalior"
       },
       {
-        title: "Advanced Seismic Design Methods for High-Rise Buildings",
-        authors: "Zhang et al.",
-        date: "2024",
-        citations: 32
+        name: "Dr. K. N Jha",
+        role: "Editorial Board Member",
+        affiliation: "IIT Delhi"
       },
       {
-        title: "Smart Infrastructure Systems: IoT Integration in Civil Engineering",
-        authors: "Brown et al.",
-        date: "2023",
-        citations: 78
+        name: "Dr. Sparsh Johari",
+        role: "Editorial Board Member",
+        affiliation: "IIT Guwahati"
+      },
+      {
+        name: "Dr. Vedat Togan",
+        role: "Editorial Board Member",
+        affiliation: "Karadeniz Technical University"
+      },
+      {
+        name: "Dr. Abhilash Shukla",
+        role: "Editorial Board Member",
+        affiliation: "MITS-DU, Gwalior"
+      },
+      {
+        name: "Dr. Prachi Singh",
+        role: "Editorial Board Member",
+        affiliation: "MITS-DU, Gwalior"
+      },
+      {
+        name: "Dr. Jay Singh Rajput",
+        role: "Editorial Board Member",
+        affiliation: "NEERI, Nagpur"
       }
     ]
   };
@@ -86,10 +114,10 @@ export default function CivilEngineeringJournal() {
         }
 
         .journal-header {
-          background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-          color: white;
-          padding: 40px 20px;
-          text-align: center;
+        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        color: white;
+        padding: 60px 20px 40px; 
+        text-align: center;
         }
 
         .journal-title {
@@ -110,7 +138,7 @@ export default function CivilEngineeringJournal() {
           padding: 1rem;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
           position: sticky;
-          top: 0;
+          top: 70px;
           z-index: 100;
         }
 
@@ -175,6 +203,38 @@ export default function CivilEngineeringJournal() {
           font-weight: 700;
           color: #1e3a8a;
           margin-bottom: 1.5rem;
+        }
+
+        .section-paragraph {
+          color: #374151;
+          line-height: 1.7;
+          margin-bottom: 1rem;
+        }
+
+        .scope-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 1rem;
+          margin-top: 1rem;
+          margin-bottom: 3rem;
+        }
+
+        .scope-item {
+          background: white;
+          padding: 1rem 1.25rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .scope-title {
+          font-weight: 600;
+          color: #1e3a8a;
+          margin-bottom: 0.5rem;
+        }
+
+        .scope-description {
+          color: #4b5563;
+          font-size: 0.95rem;
         }
 
         .editorial-board {
@@ -286,10 +346,8 @@ export default function CivilEngineeringJournal() {
   return (
     <div className="journal-page">
       <header className="journal-header">
-        <h1 className="journal-title">Lord Journal of Civil Engineering</h1>
-        <p className="journal-subtitle">
-          A leading international journal in civil engineering research and innovation
-        </p>
+        <h1 className="journal-title">Lord Journal of Civil Engineering (LJCE)</h1>
+        <p className="journal-subtitle">A peer-reviewed, open-access international journal by Lord-Tech Datus Sol Pvt. Ltd.</p>
       </header>
 
       <nav className="journal-nav">
@@ -314,25 +372,13 @@ export default function CivilEngineeringJournal() {
       </nav>
 
       <main className="main-content">
-        {/* Journal Metrics */}
-        <div className="metrics-grid">
-          <div className="metric-card">
-            <div className="metric-value">{journalInfo.metrics.impactFactor}</div>
-            <div className="metric-label">Impact Factor</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value">{journalInfo.metrics.acceptanceRate}</div>
-            <div className="metric-label">Acceptance Rate</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value">{journalInfo.metrics.reviewTime}</div>
-            <div className="metric-label">Average Review Time</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value">{journalInfo.metrics.publicationTime}</div>
-            <div className="metric-label">Time to Publication</div>
-          </div>
-        </div>
+        {/* About Us */}
+        <section id="about-us">
+          <h2 className="section-title">About Us</h2>
+          {journalInfo.about.map((paragraph, index) => (
+            <p key={index} className="section-paragraph">{paragraph}</p>
+          ))}
+        </section>
 
         {/* Editorial Board */}
         <section id="editorial-board">
@@ -343,23 +389,22 @@ export default function CivilEngineeringJournal() {
                 <div className="editor-name">{editor.name}</div>
                 <div className="editor-role">{editor.role}</div>
                 <div className="editor-affiliation">{editor.affiliation}</div>
-                <div className="editor-affiliation">{editor.expertise}</div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Recent Articles */}
-        <section>
-          <h2 className="section-title">Recent Articles</h2>
-          <div className="articles-list">
-            {journalInfo.recentArticles.map((article, index) => (
-              <div key={index} className="article-item">
-                <div className="article-title">{article.title}</div>
-                <div className="article-meta">
-                  <span>{article.authors} • {article.date}</span>
-                  <span>{article.citations} citations</span>
-                </div>
+        {/* Aim and Scope */}
+        <section id="aim-and-scope">
+          <h2 className="section-title">Aim and Scope</h2>
+          {journalInfo.aimAndScopeIntro.map((paragraph, index) => (
+            <p key={index} className="section-paragraph">{paragraph}</p>
+          ))}
+          <div className="scope-grid">
+            {journalInfo.scope.map((item, index) => (
+              <div key={index} className="scope-item">
+                <div className="scope-title">{item.title}</div>
+                <div className="scope-description">{item.description}</div>
               </div>
             ))}
           </div>
