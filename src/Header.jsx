@@ -189,10 +189,12 @@ const styles = `
   display: none;
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   cursor: pointer;
-  padding: 5px;
+  padding: 6px;
+  color: #0052cc; /* default color */
 }
+
 
 .mobile-nav {
   display: none;
@@ -313,8 +315,7 @@ function Header({ onNavigate, currentPage }) {
   const closeDropdown = useCallback(() => {
     setDropdownOpen(false);
   }, []);
-
-  // Close dropdown when clicking outside
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownOpen && !event.target.closest('.nav-item')) {
