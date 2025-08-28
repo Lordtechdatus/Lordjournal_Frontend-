@@ -4,9 +4,16 @@ import { Link } from 'react-router-dom';
 const HOMEPAGE_STYLE_ID = 'homepage-inline-styles';
 
 const styles = `
-/* Global smooth scrolling */
+/* Global smooth scrolling and prevent horizontal overflow */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* Hero Section */
@@ -19,12 +26,13 @@ html {
   background-attachment: fixed;
   color: #1a202c;
   text-align: center;
-  width: 110vw;
+  width: 100%;
+  max-width: 100vw;
   padding: 120px 20px 60px 20px;
   min-height: 100vh;
   box-sizing: border-box;
   position: relative;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .hero-section::before {
@@ -55,6 +63,13 @@ html {
   min-height: calc(100vh - 180px);
   position: relative;
   z-index: 2;
+}
+
+/* Optional modifier to nudge hero content right on large screens without overflow */
+.hero-content.right-shift {
+  margin-left: clamp(0px, 4vw, 48px);
+  margin-right: clamp(0px, 0vw, 0px);
+  align-items: flex-start;
 }
 
 .hero-title {
@@ -94,34 +109,41 @@ html {
   margin: 2rem auto;
   max-width: 750px;
   display: flex;
-  background: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-radius: 60px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 50px;
   box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.15),
-    0 8px 25px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 15px 50px rgba(0, 0, 0, 0.12),
+    0 5px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem;
   width: 100%;
   opacity: 0;
   transform: translateY(30px);
   animation: fadeInUp 1s ease 0.9s forwards;
-  transition: all 0.4s ease;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
 }
 
 .search-results {
   max-width: 750px;
   width: 100%;
-  margin: 0.5rem auto 0;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  margin: 1rem auto 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 24px;
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.08),
+    0 5px 15px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-  border: 1px solid #eee;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-sizing: border-box;
+  animation: fadeInUp 0.4s ease forwards;
 }
 
 .search-result-item {
@@ -147,20 +169,45 @@ html {
   font-weight: 600;
 }
 
+.search-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border-radius: 50px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
 .search-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.15),
+    0 8px 30px rgba(0, 82, 204, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.search-container:hover::before {
+  opacity: 1;
 }
 
 .search-input {
   flex: 1;
   border: none;
-  padding: 1.5rem 2rem;
+  padding: 1.2rem 2rem;
   font-size: 1.1rem;
   outline: none;
   background: transparent;
   color: #333;
   font-weight: 500;
+  position: relative;
+  z-index: 2;
+  border-radius: 40px;
+  transition: all 0.3s ease;
 }
 
 .search-input::placeholder {
@@ -172,15 +219,17 @@ html {
   background: linear-gradient(135deg, #0052cc 0%, #007fff 100%);
   color: #fff;
   border: none;
-  padding: 1.2rem 2.5rem;
-  font-size: 1.1rem;
-  border-radius: 50px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  border-radius: 40px;
   cursor: pointer;
-  font-weight: 700;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px rgba(0, 82, 204, 0.3);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(0, 82, 204, 0.25);
   position: relative;
   overflow: hidden;
+  z-index: 2;
+  min-width: 120px;
 }
 
 .search-button::before {
@@ -199,8 +248,9 @@ html {
 }
 
 .search-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(0, 82, 204, 0.4);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 82, 204, 0.35);
+  background: linear-gradient(135deg, #0041a3 0%, #0066cc 100%);
 }
 
 .search-button:active {
@@ -403,28 +453,33 @@ html {
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-section {
-    padding: 100px 20px 50px;
+    padding: 100px 0 50px;
     background-attachment: scroll;
     background-image: 
       linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(248, 250, 252, 0.92) 100%),
       url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop&crop=entropy&auto=format&q=80');
+    overflow: hidden;
+    width: 100vw;
+    max-width: 100vw;
   }
 
   /* Make hero content and search area span full viewport width on mobile */
   .hero-content {
-    max-width: 80%;
-    padding-left: 0;
-    padding-right: 0;
+    max-width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 0;
   }
 
   .search-container {
     flex-direction: column;
-    border-radius: 25px;
-    padding: 1.5rem;
+    border-radius: 30px;
+    padding: 1.25rem;
     max-width: 100%;
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
+    width: calc(100% - 30px);
+    margin-left: 15px;
+    margin-right: 15px;
+    gap: 1rem;
   }
 
   .search-results {
@@ -436,14 +491,16 @@ html {
 
   .search-input {
     width: 100%;
-    padding: 1.2rem;
+    padding: 1rem 1.5rem;
     text-align: center;
-    margin-bottom: 1rem;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.8);
   }
 
   .search-button {
     width: 100%;
-    padding: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 25px;
   }
 
   .card-grid {
@@ -460,11 +517,15 @@ html {
 @media (max-width: 480px) {
   .hero-section {
     padding: 90px 0 40px;
+    width: 100vw;
+    max-width: 100vw;
   }
 
   .hero-content {
-    padding-left: 0;
-    padding-right: 0;
+    max-width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin: 0;
   }
 
   .hero-title {
@@ -476,17 +537,17 @@ html {
   }
 
   .search-results {
-    width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    border-radius: 0;
+    width: calc(100% - 20px);
+    margin: 1rem 10px 0;
+    border-radius: 20px;
   }
 
   .search-container {
-    max-width: 100%;
-    width: 100%;
-    border-radius: 0;
-    margin: 1rem 0 0 0;
+    max-width: calc(100% - 20px);
+    width: calc(100% - 20px);
+    border-radius: 25px;
+    margin: 1rem 10px 0;
+    padding: 1rem;
   }
 
   .card-section {
