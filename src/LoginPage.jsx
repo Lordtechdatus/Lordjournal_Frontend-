@@ -59,22 +59,24 @@ const styles = `
   border-color: #0052cc;
   box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.2);
 }
-
+  
 .login-button {
-  background: #0052cc;
-  color: white;
-  padding: 12px 24px;
-  font-size: 1rem;
+  background-color: #0b63cf;   /* blue background */
+  color: #fff;                /* white text */
+  font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  padding: 8px 16px;
   cursor: pointer;
-  margin-top: 10px;
-  width: 100%;
-  transition: background-color 0.3s;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
 }
 
 .login-button:hover {
   background: #003d99;
+  transform: translateY(-1px);
 }
 
 .google-button {
@@ -211,7 +213,7 @@ function LoginPage({ onNavigate }) {
         ← Back to Home
       </Link>
       
-      <h1 className="login-brand">Lord Journal <span style={{ fontWeight: 400 }}>Login</span></h1>
+      <h1 className="login-brand">Lord Journal <span style={{ fontWeight: 200  }}>Login</span></h1>
       <p className="login-subtitle">Access research faster and smarter</p>
 
       <div className="login-box">

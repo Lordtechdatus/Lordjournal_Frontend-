@@ -174,21 +174,49 @@ const styles = `
   gap: 0.75rem;
 }
 
-.login-button,
+.login-button {
+  background-color: #0b63cf;   /* blue background */
+  color: #fff;                /* white text */
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1rem;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: #0956b2;   /* darker blue on hover */
+}
+
+.login-button:active {
+  background-color: #084a99;   /* even darker on click */
+}
+
+.login-button:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+/* keep logout visually different but styled */
 .logout-button {
+  background: none;
   color: #213547;
   font-weight: 500;
-  text-decoration: none;
-  background: none;
   border: none;
   cursor: pointer;
   font-size: 1rem;
+  padding: 6px 12px;
 }
 
 .mobile-menu-button {
   display: none;
   background: none;
-  border: none;
+  border: none;        
+  outline: none; 
   font-size: 1.8rem;
   cursor: pointer;
   padding: 6px;
