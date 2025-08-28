@@ -19,7 +19,7 @@ html {
   background-attachment: fixed;
   color: #1a202c;
   text-align: center;
-  width: 100%;
+  width: 110vw;
   padding: 120px 20px 60px 20px;
   min-height: 100vh;
   box-sizing: border-box;
@@ -410,16 +410,28 @@ html {
       url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=800&fit=crop&crop=entropy&auto=format&q=80');
   }
 
+  /* Make hero content and search area span full viewport width on mobile */
+  .hero-content {
+    max-width: 80%;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .search-container {
     flex-direction: column;
     border-radius: 25px;
     padding: 1.5rem;
+    max-width: 100%;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .search-results {
-    width: calc(100% - 30px);
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .search-input {
@@ -447,7 +459,12 @@ html {
 
 @media (max-width: 480px) {
   .hero-section {
-    padding: 90px 15px 40px;
+    padding: 90px 0 40px;
+  }
+
+  .hero-content {
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .hero-title {
@@ -459,9 +476,17 @@ html {
   }
 
   .search-results {
-    width: calc(100% - 20px);
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+  }
+
+  .search-container {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 0;
+    margin: 1rem 0 0 0;
   }
 
   .card-section {
