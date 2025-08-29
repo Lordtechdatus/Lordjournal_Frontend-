@@ -12,6 +12,7 @@ import AppliedScienceJournal from "./AppliedScienceJournal";
 import AIMLDSJournal from "./AIMLDSJournal";
 import LawSocialScienceJournal from "./LawSocialScienceJournal";
 import EducationJournal from "./EducationJournal";
+import ManagementJournal from "./ManagementJournal";
 import Footer from "./Footer";
 import JournalsPage from "./JournalsPage";
 import BooksPage from "./BooksPage";
@@ -116,6 +117,11 @@ function App() {
       <Route path="/journals/education" element={
         <Layout currentPage={currentPage} onNavigate={navigateTo}>
           <EducationJournal />
+        </Layout>
+      } />
+      <Route path="/journals/management" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <ManagementJournal />
         </Layout>
       } />
       <Route path="/footer" element={

@@ -175,17 +175,18 @@ const styles = `
 }
 
 .login-button {
-  background-color: #0b63cf;   /* blue background */
-  color: #fff;                /* white text */
-  font-weight: 600;
+  background: #0052cc;      /* solid blue */
+  color: white;
+  padding: 12px 24px;
+  font-size: 1rem;
   border: none;
   border-radius: 8px;
-  padding: 8px 16px;
   cursor: pointer;
-  font-size: 1rem;
-  text-decoration: none;
-  display: inline-block;
-  transition: background-color 0.2s ease;
+  margin-top: 10px;
+  width: 100%;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.15s ease;
+  box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
 }
 
 .login-button:hover {
@@ -364,7 +365,8 @@ function Header({ onNavigate, currentPage }) {
     'Lord Journal of Applied Science',
     'Lord Journal of Artificial Intelligence, Machine Learning & Data Science',
     'Lord Journal of Law & Social Science',
-    'Lord Journal of Education' 
+    'Lord Journal of Education' ,
+    'Lord Journal of Management'
   ];      
 
   const navItems = [
@@ -420,13 +422,15 @@ function Header({ onNavigate, currentPage }) {
                       let to = '#';
                       if (journal === 'Lord Journal of Civil Engineering') to = '/journals/civil-engineering';
                       if (journal === 'Lord Journal of Mechanical Engineering') to = '/journals/mechanical-engineering';
-                      if (journal === 'Lord Journal of Electronics') to = '/journals/electronics-engineering';
+                      if (journal === 'Lord Journal of Electronics Engineering') to = '/journals/electronics-engineering';
                       if (journal === 'Lord Journal of Electrical Engineering') to = '/journals/electrical-engineering';
                       if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/journals/computer-science-engineering';
                       if (journal === 'Lord Journal of Applied Science') to = '/journals/applied-science';
                       if (journal === 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science') to = '/journals/ai-ml-data-science';
                       if (journal === 'Lord Journal of Law & Social Science') to = '/journals/law-social-science';
                       if (journal === 'Lord Journal of Education') to = '/journals/education';
+                      if (journal === 'Lord Journal of Management') to = '/journals/management';
+                      
                       return (
                         <Link
                           key={`journal-${jIdx}`}
@@ -505,13 +509,14 @@ function Header({ onNavigate, currentPage }) {
                         let to = '#';
                         if (journal === 'Lord Journal of Civil Engineering') to = '/journals/civil-engineering';
                         if (journal === 'Lord Journal of Mechanical Engineering') to = '/journals/mechanical-engineering';
-                        if (journal === 'Lord Journal of Electronics') to = '/journals/electronics-engineering';
+                        if (journal === 'Lord Journal of Electronics Engineering') to = '/journals/electronics-engineering';
                         if (journal === 'Lord Journal of Electrical Engineering') to = '/journals/electrical-engineering';
                         if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/journals/computer-science-engineering';
                         if (journal === 'Lord Journal of Applied Science') to = '/journals/applied-science';
                         if (journal === 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science') to = '/journals/ai-ml-data-science';
                         if (journal === 'Lord Journal of Law & Social Science') to = '/journals/law-social-science';
                         if (journal === 'Lord Journal of Education') to = '/journals/education';
+                        if (journal === 'Lord Journal of Management') to = '/journals/management';
                         return (
                           <Link
                             key={`mobile-journal-${jIdx}`}
