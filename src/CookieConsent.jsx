@@ -1,4 +1,10 @@
 import { useState, useEffect } from "react";
+import { recordCookieConsent } from "../server/FetchNodeAdmin";
+import { 
+  getSessionCookie, 
+  setSessionCookie, 
+  generateSessionId 
+} from "./utils/cookieUtils";
 
 const COOKIE_STYLE_ID = "cookie-consent-inline-style";
 
@@ -45,6 +51,16 @@ const styles = `
   background-color: #003d99;
 }
 
+.accept-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.accept-button:disabled:hover {
+  background-color: #6c757d;
+}
+
 .decline-button {
   background-color: transparent;
   color: #fff;
@@ -58,6 +74,15 @@ const styles = `
 
 .decline-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.decline-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.decline-button:disabled:hover {
+  background-color: transparent;
 }
 
 .cookie-link {
@@ -80,6 +105,9 @@ const styles = `
 
 const CookieConsent = () => {
   const [visible, setVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+
 
   // Inject styles once
   useEffect(() => {
@@ -92,9 +120,9 @@ const CookieConsent = () => {
     }
   }, []);
 
-  // Run only once on mount
+  // Check for existing consent on mount
   useEffect(() => {
-    const hasConsent = localStorage.getItem("cookieConsent");
+    const hasConsent = getSessionCookie("cookieConsent");
     if (!hasConsent) {
       const timer = setTimeout(() => {
         setVisible(true);
@@ -103,14 +131,54 @@ const CookieConsent = () => {
     }
   }, []);
 
-  const acceptCookies = () => {
-    localStorage.setItem("cookieConsent", "true");
-    setVisible(false);
+  const recordConsentToBackend = async (consent) => {
+    try {
+      const userEmail = localStorage.getItem('userEmail');
+      const sessionId = generateSessionId();
+      
+      const consentData = {
+        userEmail: userEmail || null,
+        consent: consent,
+        userAgent: navigator.userAgent,
+        ipAddress: null, // Will be detected by backend
+        sessionId: sessionId
+      };
+
+      await recordCookieConsent(consentData);
+      
+      // Store session ID in session cookie
+      setSessionCookie("sessionId", sessionId);
+      
+    } catch (error) {
+      console.error('Error recording cookie consent:', error);
+      // Don't block the user experience if backend fails
+    }
   };
 
-  const declineCookies = () => {
-    localStorage.setItem("cookieConsent", "false");
+  const acceptCookies = async () => {
+    setIsLoading(true);
+    
+    // Set session cookie (expires when browser closes)
+    setSessionCookie("cookieConsent", "true");
+    
+    // Record consent in backend
+    await recordConsentToBackend(true);
+    
     setVisible(false);
+    setIsLoading(false);
+  };
+
+  const declineCookies = async () => {
+    setIsLoading(true);
+    
+    // Set session cookie (expires when browser closes)
+    setSessionCookie("cookieConsent", "false");
+    
+    // Record consent in backend
+    await recordConsentToBackend(false);
+    
+    setVisible(false);
+    setIsLoading(false);
   };
 
   if (!visible) return null;
@@ -126,11 +194,19 @@ const CookieConsent = () => {
         </a>.
       </p>
       <div className="cookie-buttons">
-        <button onClick={acceptCookies} className="accept-button">
-          Accept All Cookies
+        <button 
+          onClick={acceptCookies} 
+          className="accept-button"
+          disabled={isLoading}
+        >
+          {isLoading ? "Processing..." : "Accept Cookies"}
         </button>
-        <button onClick={declineCookies} className="decline-button">
-          Decline
+        <button 
+          onClick={declineCookies} 
+          className="decline-button"
+          disabled={isLoading}
+        >
+          {isLoading ? "Processing..." : "Decline"}
         </button>
       </div>
     </div>

@@ -570,7 +570,7 @@ export default function CivilEngineeringJournal() {
           >
             Editorial Board
           </a>
-          <Link to="/Login" className="nav-link">
+          <Link to="/submit" className="nav-link">
             Submit Paper
           </Link>
         </div>
@@ -617,7 +617,7 @@ export default function CivilEngineeringJournal() {
 
         {/* Submit Paper CTA */}
         <div style={{ textAlign: 'center' }}>
-          <Link to="/Login" className="submit-button">
+          <Link to="/submit" className="submit-button">
             Submit Your Paper
           </Link>
         </div>

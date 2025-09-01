@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { checkEmail, adminLogin } from '../server/FetchNodeAdmin';
 
 const LOGIN_STYLE_ID = 'login-inline-styles';
 
@@ -103,17 +104,17 @@ const styles = `
 }
 
 .login-button {
-  background: #0052cc;      /* solid blue */
+  background: #0052cc;
   color: white;
-  padding: 12px 24px;
+  padding: 15px 24px;
   font-size: 1rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 20px;
   width: 100%;
   font-weight: 600;
-  transition: background-color 0.3s, transform 0.15s ease;
+  transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 82, 204, 0.3);
 }
 
@@ -203,23 +204,6 @@ const styles = `
   right: 0;
 }
 
-.forgot-link {
-  font-size: 0.9rem;
-  color: #4285f4;
-  margin-top: 20px;
-  cursor: pointer;
-  text-decoration: none;
-  display: inline-block;
-  transition: all 0.2s ease;
-}
-
-.forgot-link:hover {
-  color: #0052cc;
-  transform: translateX(3px);
-}
-
-
-
 .form-footer {
   margin-top: 20px;
   font-size: 0.9rem;
@@ -262,6 +246,9 @@ function LoginPage({ onNavigate }) {
   const [isLoading, setIsLoading] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
+  const [userExists, setUserExists] = useState(false);
+  const navigate = useNavigate();
 
   // Inject styles once
   useEffect(() => {
@@ -285,37 +272,64 @@ function LoginPage({ onNavigate }) {
   const isEmailValid = (email) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const isPasswordStrong = (password) =>
-    password.length >= 6; // Simplified validation
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isEmailValid(email)) {
       alert('Enter a valid email address');
       return;
     }
-    if (!isPasswordStrong(password)) {
-      alert('Password must be at least 6 characters long.');
-      return;
-    }
     
     setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      localStorage.setItem('isLoggedIn', 'true');
-      setIsLoading(false);
-      if (onNavigate) {
-        onNavigate('home');
+    try {
+      if (!showPasswordInput) {
+        // First step: Check if email exists
+        const response = await checkEmail(email);
+        
+        if (response.success) {
+          if (response.exists) {
+            // User exists - show password input
+            setUserExists(true);
+            setShowPasswordInput(true);
+          } else {
+            // New user - redirect to registration
+            navigate('/register', { state: { email } });
+          }
+        } else {
+          alert(response.message || 'Something went wrong. Please try again.');
+        }
+      } else {
+        // Second step: Login with password
+        const loginResponse = await adminLogin({ email, password });
+        
+        if (loginResponse.success || loginResponse.token) {
+          // Store user email and name for profile access
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('userName', loginResponse.user?.given_names || email.split('@')[0]);
+          // Login successful - redirect to profile
+          navigate('/profile');
+        } else {
+          alert(loginResponse.message || 'Login failed. Please check your password.');
+        }
       }
-    }, 1000);
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Connection failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackToEmail = () => {
+    setShowPasswordInput(false);
+    setUserExists(false);
+    setPassword('');
   };
 
   const handleGoogleLogin = () => {
     // Simulate Google login
     setIsLoading(true);
     
-    // Simulate login process
     setTimeout(() => {
       localStorage.setItem('isLoggedIn', 'true');
       setIsLoading(false);
@@ -325,12 +339,8 @@ function LoginPage({ onNavigate }) {
     }, 1000);
   };
 
-
-
   return (
     <div className="login-container">
-
-      
       <div className="login-brand" style={{animation: 'fadeInDown 0.6s ease-out'}}>
         Lord Journal <span style={{ fontWeight: 300 }}>Login</span>
       </div>
@@ -355,7 +365,9 @@ function LoginPage({ onNavigate }) {
             {isLoading ? 'Connecting...' : 'Continue with Google'}
           </button>
           <p className="or-divider">OR</p>
-          <button className="signup-button" disabled={isLoading}>Sign up with Email</button>
+          <button className="signup-button" disabled={isLoading} onClick={() => navigate('/register')}>
+            Sign up with Email
+          </button>
           <p className="form-footer">By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
         </div>
 
@@ -364,43 +376,80 @@ function LoginPage({ onNavigate }) {
           className="login-column"
           style={{animation: 'fadeInRight 0.6s ease-out'}}
         >
-          <h3>Email Login</h3>
-          <div className="input-container">
-            <input
-              type="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onFocus={() => setEmailFocused(true)}
-              onBlur={() => setEmailFocused(false)}
-              required
-              className="login-input"
-              autoComplete="email"
-              style={emailFocused ? {transform: 'translateY(-2px)'} : {}}
-            />
-          </div>
-          <div className="input-container">
-            <input
-              type="password"
-              placeholder="Your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onFocus={() => setPasswordFocused(true)}
-              onBlur={() => setPasswordFocused(false)}
-              required
-              className="login-input"
-              autoComplete="current-password"
-              style={passwordFocused ? {transform: 'translateY(-2px)'} : {}}
-            />
-          </div>
+          <h3>{showPasswordInput ? 'Enter Your Password' : 'Enter Your Email'}</h3>
+          <p style={{ color: '#666', marginBottom: '20px', fontSize: '0.9rem' }}>
+            {showPasswordInput 
+              ? `Welcome back! Please enter your password for ${email}`
+              : 'We\'ll send you a secure link to access your account'
+            }
+          </p>
+          
+          {!showPasswordInput ? (
+            // Email input
+            <div className="input-container">
+              <input
+                type="email"
+                placeholder="Your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
+                required
+                className="login-input"
+                autoComplete="email"
+                style={emailFocused ? {transform: 'translateY(-2px)'} : {}}
+              />
+            </div>
+          ) : (
+            // Password input
+            <>
+              <div className="input-container">
+                <input
+                  type="password"
+                  placeholder="Your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
+                  required
+                  className="login-input"
+                  autoComplete="current-password"
+                  style={passwordFocused ? {transform: 'translateY(-2px)'} : {}}
+                />
+              </div>
+              
+              <button 
+                type="button"
+                onClick={handleBackToEmail}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#666',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  marginBottom: '20px',
+                  textDecoration: 'underline'
+                }}
+              >
+                ← Use different email
+              </button>
+            </>
+          )}
+          
           <button 
             type="submit" 
             className="login-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Checking...' : (showPasswordInput ? 'Login' : 'Continue')}
           </button>
-          </form>
+          
+          {!showPasswordInput && (
+            <p className="form-footer" style={{ marginTop: '15px' }}>
+              Already have an account? <a href="#" onClick={(e) => { e.preventDefault(); setShowPasswordInput(true); }}>Sign in</a>
+            </p>
+          )}
+        </form>
       </div>
       
       <style>

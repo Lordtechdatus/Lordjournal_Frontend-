@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const HEADER_STYLE_ID = 'header-inline-styles';
 const styles = `
@@ -279,15 +279,142 @@ const styles = `
   .logo-text { font-size: 1.2rem; }
   .logo-image { height: 30px; }
 }
+
+  .auth-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .login-btn {
+    background: #0052cc;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .login-btn:hover {
+    background: #003d99;
+    transform: translateY(-1px);
+  }
+
+  /* User Menu Styles */
+  .user-menu {
+    position: relative;
+  }
+
+  .user-menu-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .user-menu-trigger:hover {
+    background: rgba(0, 82, 204, 0.1);
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #0052cc, #4285f4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .user-name {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .dropdown-arrow {
+    font-size: 12px;
+    color: #666;
+    transition: transform 0.2s ease;
+  }
+
+  .user-menu.open .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e1e5ee;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+    margin-top: 8px;
+  }
+
+  .user-info {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .user-email {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .user-actions {
+    padding: 10px;
+  }
+
+  .user-action-btn {
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+  }
+
+  .user-action-btn:hover {
+    background: #f8fafc;
+  }
+
+  .user-action-btn.logout {
+    color: #ef4444;
+  }
+
+  .user-action-btn.logout:hover {
+    background: #fef2f2;
+  }
 `;
 
-function Header({ onNavigate, currentPage }) {
+function Header({ currentPage, onNavigate }) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const userMenuRef = useRef(null);
+  const closeDelayRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Inject styles once
   useEffect(() => {
@@ -300,50 +427,97 @@ function Header({ onNavigate, currentPage }) {
     }
   }, []);
 
-  // Initialize login state only once on mount
+  // Check authentication status on component mount and route changes
   useEffect(() => {
-    try {
-      const loginStatus = localStorage.getItem('isLoggedIn') === 'true';
-      setIsLoggedIn(loginStatus);
-    } catch (error) {
-      console.warn('Error reading localStorage:', error);
-      setIsLoggedIn(false);
-    } finally {
-      setIsLoading(false);
-    }
+    checkAuthStatus();
+  }, [location.pathname]);
+
+  // Handle clicks outside dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = useCallback(() => {
-    try {
-      localStorage.removeItem('isLoggedIn');
+  const checkAuthStatus = () => {
+    const authToken = localStorage.getItem('adminAuthToken');
+    const userEmail = localStorage.getItem('userEmail');
+    
+    if (authToken && userEmail) {
+      setIsLoggedIn(true);
+      // Get user info from localStorage or fetch from API
+      setUserInfo({
+        name: localStorage.getItem('userName') || userEmail.split('@')[0],
+        email: userEmail,
+        initials: userEmail.split('@')[0].substring(0, 2).toUpperCase()
+      });
+    } else {
       setIsLoggedIn(false);
-    } catch (error) {
-      console.warn('Error removing from localStorage:', error);
+      setUserInfo(null);
     }
-  }, []);
+  };
 
-  const handleLogin = useCallback(() => {
+  const handleLogout = () => {
+    // Clear all auth data
+    localStorage.removeItem('adminAuthToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    
+    // Reset state
+    setIsLoggedIn(false);
+    setUserInfo(null);
+    setIsUserMenuOpen(false);
+    
+    // Redirect to homepage
+    navigate('/');
+  };
+
+  const handleProfile = () => {
+    navigate('/profile');
+    setIsUserMenuOpen(false);
+  };
+
+  const handleLogin = () => {
     navigate('/login');
-    setMobileMenuOpen(false);
-    setDropdownOpen(false);
-  }, [navigate]);
+  };
 
-  const toggleMobileMenu = useCallback(() => {
+  const openMenu = () => {
+    if (closeDelayRef.current) {
+      clearTimeout(closeDelayRef.current);
+    }
+    setDropdownOpen(true);
+  };
+
+  const closeMenu = () => {
+    closeDelayRef.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 150);
+  };
+
+  const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
-  }, []);
+  };
 
-  const closeMobileMenu = useCallback(() => {
+  const closeMobileMenu = () => {
     setMobileMenuOpen(false);
-    setMobileDropdownOpen(false); // Also close mobile dropdown when closing mobile menu
-  }, []);
+    setMobileDropdownOpen(false);
+  };
 
-  const toggleDropdown = useCallback(() => {
+  const toggleDropdown = () => {
     setDropdownOpen(prev => !prev);
-  }, []);
+  };
 
-  const closeDropdown = useCallback(() => {
+  const closeDropdown = () => {
     setDropdownOpen(false);
-  }, []);
+  };
   
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -375,19 +549,7 @@ function Header({ onNavigate, currentPage }) {
     { name: 'Submission Link', hasDropdown: false }
   ];
 
-  // Skeleton while loading initial state
-  if (isLoading) {
-    return (
-      <header className="header">
-        <div className="header-container">
-          <Link to="/" className="logo-section" style={{ textDecoration: 'none' }}>
-            <div className="logo-placeholder">LJ</div>
-            <h1 className="logo-text">Lord Journals</h1>
-          </Link>
-        </div>
-      </header>
-    );
-  }
+  // No loading state needed - remove this section
 
   return (
     <header className="header">
@@ -424,7 +586,7 @@ function Header({ onNavigate, currentPage }) {
                       if (journal === 'Lord Journal of Mechanical Engineering') to = '/journals/mechanical-engineering';
                       if (journal === 'Lord Journal of Electronics Engineering') to = '/journals/electronics-engineering';
                       if (journal === 'Lord Journal of Electrical Engineering') to = '/journals/electrical-engineering';
-                      if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/journals/computer-science-engineering';
+                      if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/j  ournals/computer-science-engineering';
                       if (journal === 'Lord Journal of Applied Science') to = '/journals/applied-science';
                       if (journal === 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science') to = '/journals/ai-ml-data-science';
                       if (journal === 'Lord Journal of Law & Social Science') to = '/journals/law-social-science';
@@ -448,7 +610,12 @@ function Header({ onNavigate, currentPage }) {
                 <a
                   href="#"
                   className="nav-link"
-                  onClick={(e) => e.preventDefault()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (item.name === 'Submission Link') {
+                      navigate('/submit');
+                    }
+                  }}
                 >
                   {item.name}
                 </a>
@@ -467,25 +634,48 @@ function Header({ onNavigate, currentPage }) {
           {mobileMenuOpen ? '✕' : '☰'}
         </button>
 
-        {/* Right - Auth */}
-        <div className="auth-section">
-          {isLoggedIn ? (
-            <>
-              <button onClick={handleLogout} className="logout-button">
-                Logout
+         {/* User Authentication Section */}
+         <div className="user-section">
+          {isLoggedIn && userInfo ? (
+            // Logged in user
+            <div className={`user-menu ${isUserMenuOpen ? 'open' : ''}`} ref={userMenuRef}>
+              <button 
+                className="user-menu-trigger"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              >
+                <div className="user-avatar">
+                  {userInfo.initials}
+                </div>
+                <span className="user-name">{userInfo.name}</span>
+                <span className="dropdown-arrow">▼</span>
               </button>
-              <span role="img" aria-label="unlocked">🔓</span>
-            </>
+              
+              {isUserMenuOpen && (
+                <div className="user-dropdown-menu">
+                  <div className="user-info">
+                    <div className="user-email">{userInfo.email}</div>
+                  </div>
+                  <div className="user-actions">
+                    <button onClick={handleProfile} className="user-action-btn">
+                      👤 My Profile
+                    </button>
+                    <button onClick={handleLogout} className="user-action-btn logout">
+                      🚪 Logout
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
-            <>
-              <button onClick={handleLogin} className="login-button">
-                Log in
+            // Not logged in
+            <div className="auth-buttons">
+              <button onClick={handleLogin} className="login-btn">
+                🔑 Login
               </button>
-              <span role="img" aria-label="locked">🔐</span>
-            </>
+            </div>
           )}
         </div>
-      </div>
+      </div>  
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
@@ -538,6 +728,9 @@ function Header({ onNavigate, currentPage }) {
                   onClick={(e) => {
                     e.preventDefault();
                     closeMobileMenu();
+                    if (item.name === 'Submission Link') {
+                      navigate('/submit');
+                    }
                   }}
                 >
                   {item.name}

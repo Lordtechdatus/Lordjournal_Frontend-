@@ -3,6 +3,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Homepage from "./Homepage";
 import LoginPage from "./LoginPage";
+import RegisterPage from "./RegisterPage";
+import UserProfile from "./UserProfile";
+import PaperSubmissionPage from "./PaperSubmissionPage";
 import CivilEngineeringJournal from "./CivilEngineeringJournal";
 import MechanicalEngineeringJournal from "./MechanicalEngineeringJournal";
 import ElectronicsEngineeringJournal from "./ElectronicsEngineeringJournal";
@@ -15,10 +18,12 @@ import EducationJournal from "./EducationJournal";
 import ManagementJournal from "./ManagementJournal";
 import Footer from "./Footer";
 import JournalsPage from "./JournalsPage";
+import CookieConsent from "./CookieConsent";
+import PrivacyPolicy from "./Privacy";
 import BooksPage from "./BooksPage";
 import DatabasesPage from "./DatabasesPage";
 import PlatformsPage from "./PlatformsPage";
-
+import ConnectionTest from "../server/FetchNodeAdmin";
 
 
 const APP_STYLE_ID = "app-inline-style";
@@ -63,6 +68,7 @@ function App() {
   };
 
   return (
+    <>
     <Routes>
       <Route path="/" element={
         <Layout currentPage={currentPage} onNavigate={navigateTo}>
@@ -72,6 +78,21 @@ function App() {
       <Route path="/login" element={
         <Layout currentPage={currentPage} onNavigate={navigateTo}>
           <LoginPage onNavigate={navigateTo} />
+        </Layout>
+      } />
+      <Route path="/register" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <RegisterPage />
+        </Layout>
+      } />
+      <Route path="/profile" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <UserProfile />
+        </Layout>
+      } />
+      <Route path="/submit" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <PaperSubmissionPage />
         </Layout>
       } />
       <Route path="/journals/civil-engineering" element={
@@ -147,8 +168,20 @@ function App() {
           <PlatformsPage />
         </Layout>
       } />
+      <Route path="/test-connection" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <ConnectionTest />
+        </Layout>
+      } />
+      <Route path="/privacy" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <PrivacyPolicy />
+        </Layout>
+      } />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    <CookieConsent />
+  </>
   );
 }
 

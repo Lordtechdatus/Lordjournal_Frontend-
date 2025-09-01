@@ -185,7 +185,7 @@ export default function AppliedScienceJournal() {
         </section>
 
         <div style={{ textAlign: 'center' }}>
-          <Link to="/Login" className="submit-button">Submit Your Paper</Link>
+          <Link to="/submit" className="submit-button">Submit Your Paper</Link>
         </div>
       </main>
     </div>
