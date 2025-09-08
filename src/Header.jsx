@@ -464,7 +464,18 @@ function Header({ currentPage, onNavigate }) {
       setUserInfo(null);
     }
   };
-
+  const handleClick = (e) => {
+    if (location.pathname === "/") {
+      // already on home: don't reload route, just scroll
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      // go home, then scroll to top on next tick
+      navigate("/");
+      setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 0);
+    }
+  };
+  
   const handleLogout = () => {
     // Clear all auth data
     localStorage.removeItem('adminAuthToken');
@@ -555,7 +566,7 @@ function Header({ currentPage, onNavigate }) {
     <header className="header">
       <div className="header-container">
         {/* Logo */}
-        <Link to="/" className="logo-section" style={{ textDecoration: 'none' }}>
+        <Link to="/" className="logo-section" style={{ textDecoration: 'none' }} onClick={handleClick}>
           <div className="logo-placeholder">LJ</div>
           <h1 className="logo-text">Lord Journals</h1>
         </Link>
@@ -586,7 +597,7 @@ function Header({ currentPage, onNavigate }) {
                       if (journal === 'Lord Journal of Mechanical Engineering') to = '/journals/mechanical-engineering';
                       if (journal === 'Lord Journal of Electronics Engineering') to = '/journals/electronics-engineering';
                       if (journal === 'Lord Journal of Electrical Engineering') to = '/journals/electrical-engineering';
-                      if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/j  ournals/computer-science-engineering';
+                      if (journal === 'Lord Journal of Computer Science & Engineering (CSE)') to = '/journals/computer-science-engineering';
                       if (journal === 'Lord Journal of Applied Science') to = '/journals/applied-science';
                       if (journal === 'Lord Journal of Artificial Intelligence, Machine Learning & Data Science') to = '/journals/ai-ml-data-science';
                       if (journal === 'Lord Journal of Law & Social Science') to = '/journals/law-social-science';

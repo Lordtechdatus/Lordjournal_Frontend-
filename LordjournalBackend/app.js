@@ -9,6 +9,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var registrationRouter = require('./routes/registration');
+var adminRouter = require('./routes/admin');
+var adminAuthRouter = require('./routes/adminAuth');
 var app = express();
 
 app.use(cors());
@@ -28,9 +30,12 @@ app.use('/api', indexRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/registration', registrationRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/admin-auth', adminAuthRouter);
 
 // Health check endpoint at /api/health
 app.get('/api/health', (req, res) => res.json({ ok: true, ts: Date.now() }));
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

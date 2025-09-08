@@ -313,15 +313,7 @@ function RegisterPage() {
       termsAccepted
     );
     
-    // Debug logging
-    console.log('Form validation:', {
-      givenNames: formData.givenNames.trim(),
-      familyName: formData.familyName.trim(),
-      passwordValid: isPasswordValid(formData.password),
-      passwordsMatch: doPasswordsMatch(),
-      termsAccepted,
-      overallValid: isValid
-    });
+
     
     return isValid;
   };
@@ -367,7 +359,6 @@ function RegisterPage() {
         alert(response.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      console.error('Registration error:', error);
       alert('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);

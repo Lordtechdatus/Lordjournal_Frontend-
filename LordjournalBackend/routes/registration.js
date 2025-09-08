@@ -1,13 +1,53 @@
+// routes/registration.js
 const express = require('express');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const pool = require('./pool');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-// User Registration
-router.post('/register', async (req, res) => {
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads');
+    // Create uploads directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename with timestamp
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Allow only specific file types
+    const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(fileExtension)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF, DOC, DOCX, and TXT files are allowed'));
+    }
+  }
+});
+
+/** ---------------------------
+ *  Registration (shared handler)
+ *  ---------------------------
+ */
+const registerHandler = async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
     const { email, givenNames, familyName, password, termsAccepted, marketingAccepted } = req.body;
 
@@ -50,29 +90,23 @@ router.post('/register', async (req, res) => {
     const [result] = await connection.execute(
       `INSERT INTO users (email, given_names, family_name, password_hash, terms_accepted, marketing_accepted, verification_token) 
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [email, givenNames, familyName, passwordHash, termsAccepted, marketingAccepted, verificationToken]
+      [email, givenNames, familyName, passwordHash, termsAccepted, marketingAccepted ?? null, verificationToken]
     );
 
     const userId = result.insertId;
 
     // Create user profile
-    await connection.execute(
-      'INSERT INTO user_profiles (user_id) VALUES (?)',
-      [userId]
-    );
+    await connection.execute('INSERT INTO user_profiles (user_id) VALUES (?)', [userId]);
 
     // TODO: Send verification email here
-    // For now, we'll just return success
 
     res.status(201).json({
       success: true,
       message: 'Registration successful! Please check your email for verification.',
-      userId: userId,
-      verificationToken: verificationToken // Remove this in production
+      userId,
+      verificationToken // Remove this in production
     });
-
   } catch (error) {
-    console.error('Registration error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during registration'
@@ -80,12 +114,23 @@ router.post('/register', async (req, res) => {
   } finally {
     connection.release();
   }
-});
+};
 
-// Email Verification
+// Base alias so POST /api/registration works
+router.post('/', registerHandler);
+
+// Existing explicit endpoint still works: POST /api/registration/register
+router.post('/register', registerHandler);
+
+// Quick wiring test: GET /api/registration
+router.get('/', (req, res) => res.json({ ok: true, service: 'registration' }));
+
+/** ---------------------------
+ *  Email Verification
+ *  ---------------------------
+ */
 router.get('/verify/:token', async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
     const { token } = req.params;
 
@@ -114,9 +159,7 @@ router.get('/verify/:token', async (req, res) => {
       success: true,
       message: 'Email verified successfully! You can now login.'
     });
-
   } catch (error) {
-    console.error('Verification error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during verification'
@@ -126,10 +169,12 @@ router.get('/verify/:token', async (req, res) => {
   }
 });
 
-// Check if email exists (for login flow)
+/** ---------------------------
+ *  Check if email exists (login flow helper)
+ *  ---------------------------
+ */
 router.post('/check-email', async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
     const { email } = req.body;
 
@@ -164,9 +209,7 @@ router.post('/check-email', async (req, res) => {
         emailVerified: users[0].email_verified
       });
     }
-
   } catch (error) {
-    console.error('Email check error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during email check'
@@ -176,10 +219,12 @@ router.post('/check-email', async (req, res) => {
   }
 });
 
-// User Login
+/** ---------------------------
+ *  User Login
+ *  ---------------------------
+ */
 router.post('/login', async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
     const { email, password } = req.body;
 
@@ -206,20 +251,8 @@ router.post('/login', async (req, res) => {
 
     const user = users[0];
 
-    // Check if email is verified
-    // Temporarily commented out for testing - remove this comment to re-enable
-    /*
-    if (!user.email_verified) {
-      return res.status(401).json({
-        success: false,
-        message: 'Please verify your email before logging in'
-      });
-    }
-    */
-
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
-    
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
@@ -227,20 +260,16 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate JWT token (you'll need to implement this)
-    // For now, we'll return a simple success response
-    const token = `user_${user.id}_${Date.now()}`; // Simple token for demo
+    // TODO: Replace with real JWT
+    const token = `user_${user.id}_${Date.now()}`;
 
     // Update last login
-    await connection.execute(
-      'UPDATE users SET last_login = NOW() WHERE id = ?',
-      [user.id]
-    );
+    await connection.execute('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
 
     res.json({
       success: true,
       message: 'Login successful',
-      token: token,
+      token,
       user: {
         id: user.id,
         email: user.email,
@@ -249,9 +278,7 @@ router.post('/login', async (req, res) => {
         email_verified: user.email_verified
       }
     });
-
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during login'
@@ -261,10 +288,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Get user profile
+/** ---------------------------
+ *  Get user profile
+ *  ---------------------------
+ */
 router.get('/profile/:email', async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
     const { email } = req.params;
 
@@ -280,7 +309,16 @@ router.get('/profile/:email', async (req, res) => {
       [email]
     );
 
-    // Get journal submissions data
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    const user = users[0];
+
+    // Get journal submissions data (after we confirm user exists)
     const [submissions] = await connection.execute(
       `SELECT 
         journal_name, 
@@ -291,22 +329,13 @@ router.get('/profile/:email', async (req, res) => {
       WHERE user_id = ? 
       GROUP BY journal_name, status
       ORDER BY journal_name`,
-      [users[0].id]
+      [user.id]
     );
 
-    if (users.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
-    const user = users[0];
-    
     // Process journal submissions data
     const journalSubmissions = [];
     const journalMap = new Map();
-    
+
     submissions.forEach(submission => {
       const key = submission.journal_name;
       if (!journalMap.has(key)) {
@@ -319,16 +348,20 @@ router.get('/profile/:email', async (req, res) => {
       }
       journalMap.get(key).count += submission.count;
     });
-    
+
     journalMap.forEach(submission => {
       journalSubmissions.push(submission);
     });
-    
+
     // Calculate stats
     const totalPapers = submissions.reduce((sum, sub) => sum + sub.count, 0);
-    const published = submissions.filter(sub => sub.status === 'published').reduce((sum, sub) => sum + sub.count, 0);
-    const underReview = submissions.filter(sub => sub.status === 'under_review').reduce((sum, sub) => sum + sub.count, 0);
-    
+    const published = submissions
+      .filter(sub => sub.status === 'published')
+      .reduce((sum, sub) => sum + sub.count, 0);
+    const underReview = submissions
+      .filter(sub => sub.status === 'under_review')
+      .reduce((sum, sub) => sum + sub.count, 0);
+
     // Format the response
     const userProfile = {
       id: user.id,
@@ -356,9 +389,7 @@ router.get('/profile/:email', async (req, res) => {
       success: true,
       user: userProfile
     });
-
   } catch (error) {
-    console.error('Error getting user profile:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error while getting profile'
@@ -368,51 +399,59 @@ router.get('/profile/:email', async (req, res) => {
   }
 });
 
-// Submit Paper
-router.post('/submit-paper', async (req, res) => {
+/** ---------------------------
+ *  Submit Paper
+ *  ---------------------------
+ */
+router.post('/submit-paper', upload.single('paperFile'), async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
-    const { userEmail, journalName, journalIcon, paperTitle, fileName } = req.body;
-    
+    const { userEmail, journalName, journalIcon, paperTitle } = req.body;
+
     if (!userEmail || !journalName || !paperTitle) {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields'
       });
     }
-    
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Paper file is required'
+      });
+    }
+
     // Get user ID
     const [users] = await connection.execute(
       'SELECT id FROM users WHERE email = ?',
       [userEmail]
     );
-    
+
     if (users.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     const userId = users[0].id;
-    
-    // Insert submission
+
+    // Insert submission with file path
     const [result] = await connection.execute(
       `INSERT INTO user_submissions 
        (user_id, journal_name, journal_icon, paper_title, file_path, status) 
        VALUES (?, ?, ?, ?, ?, 'submitted')`,
-      [userId, journalName, journalIcon, paperTitle, fileName]
+      [userId, journalName, journalIcon || null, paperTitle, req.file.filename]
     );
-    
+
     res.json({
       success: true,
       message: 'Paper submitted successfully',
-      submissionId: result.insertId
+      submissionId: result.insertId,
+      fileName: req.file.filename
     });
-    
   } catch (error) {
-    console.error('Error submitting paper:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during paper submission'
@@ -422,43 +461,45 @@ router.post('/submit-paper', async (req, res) => {
   }
 });
 
-// Update User Profile
+/** ---------------------------
+ *  Update User Profile
+ *  ---------------------------
+ */
 router.put('/update-profile', async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
-    const { 
-      userEmail, 
-      given_names, 
-      family_name, 
-      new_email, 
-      current_password, 
-      new_password 
+    const {
+      userEmail,
+      given_names,
+      family_name,
+      new_email,
+      current_password,
+      new_password
     } = req.body;
-    
+
     if (!userEmail || !given_names || !family_name) {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields'
       });
     }
-    
+
     // Get user data
     const [users] = await connection.execute(
       'SELECT id, email, password_hash FROM users WHERE email = ?',
       [userEmail]
     );
-    
+
     if (users.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
-    
+
     const user = users[0];
     const userId = user.id;
-    
+
     // Check if email is being changed
     if (new_email && new_email !== userEmail) {
       // Check if new email already exists
@@ -466,7 +507,7 @@ router.put('/update-profile', async (req, res) => {
         'SELECT id FROM users WHERE email = ? AND id != ?',
         [new_email, userId]
       );
-      
+
       if (existingUsers.length > 0) {
         return res.status(400).json({
           success: false,
@@ -474,7 +515,7 @@ router.put('/update-profile', async (req, res) => {
         });
       }
     }
-    
+
     // Handle password change
     if (new_password) {
       if (!current_password) {
@@ -483,7 +524,7 @@ router.put('/update-profile', async (req, res) => {
           message: 'Current password is required to change password'
         });
       }
-      
+
       // Verify current password
       const isCurrentPasswordValid = await bcrypt.compare(current_password, user.password_hash);
       if (!isCurrentPasswordValid) {
@@ -492,42 +533,42 @@ router.put('/update-profile', async (req, res) => {
           message: 'Current password is incorrect'
         });
       }
-      
+
       // Hash new password
       const saltRounds = 12;
       const newPasswordHash = await bcrypt.hash(new_password, saltRounds);
-      
+
       // Update password
       await connection.execute(
         'UPDATE users SET password_hash = ? WHERE id = ?',
         [newPasswordHash, userId]
       );
     }
-    
-    // Update user profile
+
+    // Build update for users table
     const updateFields = [];
     const updateValues = [];
-    
+
     updateFields.push('given_names = ?');
     updateValues.push(given_names);
-    
+
     updateFields.push('family_name = ?');
     updateValues.push(family_name);
-    
+
     if (new_email && new_email !== userEmail) {
       updateFields.push('email = ?');
       updateValues.push(new_email);
-      
+
       // Reset email verification if email is changed
       updateFields.push('email_verified = FALSE');
     }
-    
+
     updateValues.push(userId);
-    
+
     const updateQuery = `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`;
     await connection.execute(updateQuery, updateValues);
-    
-    // Update user_profiles table if it exists
+
+    // Update/ensure user_profiles row exists
     try {
       await connection.execute(
         `INSERT INTO user_profiles (user_id, updated_at) 
@@ -535,11 +576,10 @@ router.put('/update-profile', async (req, res) => {
          ON DUPLICATE KEY UPDATE updated_at = NOW()`,
         [userId]
       );
-    } catch (error) {
-      // user_profiles table might not exist, that's okay
-      console.log('user_profiles table not found, skipping update');
+    } catch (e) {
+      // user_profiles table might not exist—ignore
     }
-    
+
     res.json({
       success: true,
       message: 'Profile updated successfully',
@@ -547,12 +587,10 @@ router.put('/update-profile', async (req, res) => {
         given_names,
         family_name,
         email: new_email || userEmail,
-        email_changed: new_email && new_email !== userEmail
+        email_changed: Boolean(new_email && new_email !== userEmail)
       }
     });
-    
   } catch (error) {
-    console.error('Error updating profile:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during profile update'
@@ -562,26 +600,28 @@ router.put('/update-profile', async (req, res) => {
   }
 });
 
-// Cookie Consent Tracking
+/** ---------------------------
+ *  Cookie Consent Tracking
+ *  ---------------------------
+ */
 router.post('/cookie-consent', async (req, res) => {
   const connection = await pool.getConnection();
-  
   try {
-    const { 
-      userEmail, 
-      consent, 
-      userAgent, 
-      ipAddress, 
-      sessionId 
+    const {
+      userEmail,
+      consent,
+      userAgent,
+      ipAddress,
+      sessionId
     } = req.body;
-    
-    if (!consent || typeof consent !== 'boolean') {
+
+    if (typeof consent !== 'boolean') {
       return res.status(400).json({
         success: false,
         message: 'Consent status is required'
       });
     }
-    
+
     // Get user ID if email is provided (for logged-in users)
     let userId = null;
     if (userEmail) {
@@ -593,7 +633,7 @@ router.post('/cookie-consent', async (req, res) => {
         userId = users[0].id;
       }
     }
-    
+
     // Store cookie consent in database
     const [result] = await connection.execute(
       `INSERT INTO cookie_consents 
@@ -601,15 +641,13 @@ router.post('/cookie-consent', async (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?, NOW())`,
       [userId, userEmail || null, consent, userAgent || null, ipAddress || null, sessionId || null]
     );
-    
+
     res.json({
       success: true,
       message: 'Cookie consent recorded successfully',
       consentId: result.insertId
     });
-    
   } catch (error) {
-    console.error('Error recording cookie consent:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during cookie consent recording'

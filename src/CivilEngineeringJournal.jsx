@@ -5,6 +5,22 @@ export default function CivilEngineeringJournal() {
   const [activeTab, setActiveTab] = useState('home');
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Reusable scroll function for anchor links
+  const scrollToSection = (sectionId, tabName = null) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navbarHeight = 115; // Main header (70px) + navbar height + padding
+      const elementPosition = element.offsetTop - navbarHeight;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: "smooth"
+      });
+    }                     
+    if (tabName) {
+      setActiveTab(tabName);
+    }
+  };
+
   // Journal content
   const journalInfo = {
     about: [
@@ -111,6 +127,18 @@ export default function CivilEngineeringJournal() {
         .journal-page {
           min-height: 100vh;
           background-color: #f8f9fa;
+          scroll-padding-top: 115px; /* Account for main header (70px) + navbar height + padding */
+        }
+
+        /* Global scroll behavior for anchor links */
+        html {
+          scroll-behavior: smooth;
+          scroll-padding-top: 115px; /* Global scroll padding for all anchor links */
+        }
+
+        /* Ensure all sections have proper scroll margin */
+        section[id] {
+          scroll-margin-top: 115px;
         }
 
         .journal-header {
@@ -178,6 +206,7 @@ export default function CivilEngineeringJournal() {
           max-width: 1200px;
           margin: 2rem auto;
           padding: 0 1rem;
+          text-align: left;
         }
 
         .metrics-grid {
@@ -212,12 +241,16 @@ export default function CivilEngineeringJournal() {
           font-weight: 700;
           color: #1e3a8a;
           margin-bottom: 1.5rem;
+          text-align: left;
+          scroll-margin-top: 110px; /* Ensure proper spacing when scrolling to sections */
         }
 
         .section-paragraph {
           color: #374151;
           line-height: 1.7;
           margin-bottom: 1rem;
+          text-align: left;
+          max-width: 100%;
         }
 
         .scope-grid {
@@ -233,17 +266,21 @@ export default function CivilEngineeringJournal() {
           padding: 1rem 1.25rem;
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+          text-align: left;
         }
 
         .scope-title {
           font-weight: 600;
           color: #1e3a8a;
           margin-bottom: 0.5rem;
+          text-align: left;
         }
 
         .scope-description {
           color: #4b5563;
           font-size: 0.95rem;
+          text-align: left;
+          line-height: 1.5;
         }
 
         .editorial-board {
@@ -258,6 +295,7 @@ export default function CivilEngineeringJournal() {
           padding: 1.5rem;
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          text-align: left;
         }
 
         .editor-name {
@@ -265,17 +303,20 @@ export default function CivilEngineeringJournal() {
           font-weight: 600;
           color: #1e3a8a;
           margin-bottom: 0.5rem;
+          text-align: left;
         }
 
         .editor-role {
           color: #4b5563;
           font-size: 0.9rem;
           margin-bottom: 0.5rem;
+          text-align: left;
         }
 
         .editor-affiliation {
           color: #6b7280;
           font-size: 0.9rem;
+          text-align: left;
         }
 
         .articles-list {
@@ -398,13 +439,13 @@ export default function CivilEngineeringJournal() {
           .section-title {
             font-size: 1.25rem;
             margin-bottom: 0.875rem;
-            text-align: center;
+            text-align: left;
           }
 
           .section-paragraph {
             font-size: 0.85rem;
             line-height: 1.5;
-            text-align: justify;
+            text-align: left;
           }
 
           .scope-grid {
@@ -435,7 +476,7 @@ export default function CivilEngineeringJournal() {
 
           .editor-card {
             padding: 1rem;
-            text-align: center;
+            text-align: left;
           }
 
           .editor-name {
@@ -502,11 +543,13 @@ export default function CivilEngineeringJournal() {
           .section-title {
             font-size: 1.1rem;
             margin-bottom: 0.75rem;
+            text-align: left;
           }
 
           .section-paragraph {
             font-size: 0.8rem;
             line-height: 1.4;
+            text-align: left;
           }
 
           .scope-item {
@@ -564,11 +607,34 @@ export default function CivilEngineeringJournal() {
             <span role="img" aria-label="home">🏠</span> Home
           </Link>
           <a
+            href="#about-us"
+            className={'nav-link' + (activeTab === 'about' ? ' active' : '')}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('about-us', 'about');
+            }}
+          >
+            About Us
+          </a>
+          <a
             href="#editorial-board"
             className={'nav-link' + (activeTab === 'editorial' ? ' active' : '')}
-            onClick={() => setActiveTab('editorial')}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('editorial-board', 'editorial');
+            }}
           >
             Editorial Board
+          </a>
+          <a
+            href="#aim-and-scope"
+            className={'nav-link' + (activeTab === 'scope' ? ' active' : '')}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('aim-and-scope', 'scope');
+            }}
+          >
+            Aim & Scope
           </a>
           <Link to="/submit" className="nav-link">
             Submit Paper

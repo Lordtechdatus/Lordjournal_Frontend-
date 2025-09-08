@@ -323,6 +323,45 @@ const styles = `
   text-align: center;
 }
 
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.upload-section {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.submit-section {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.journal-card {
+  transition: all 0.3s ease;
+}
+
+.journal-card:hover {
+  transform: translateY(-3px);
+}
+
 @media (max-width: 768px) {
   .submission-container {
     padding: 100px 15px 40px;
@@ -377,6 +416,39 @@ function PaperSubmissionPage() {
   const handleJournalSelect = (journal) => {
     setSelectedJournal(journal);
     setError('');
+    
+    // Scroll to upload section after a short delay to allow state update
+    setTimeout(() => {
+      const uploadSection = document.querySelector('.upload-section');
+      if (uploadSection) {
+        const navbarHeight = 120; // Account for fixed header/navbar
+        const elementPosition = uploadSection.offsetTop - navbarHeight;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  };
+
+  const handleChangeJournal = () => {
+    setSelectedJournal(null);
+    setUploadedFile(null);
+    setError('');
+    setSuccess('');
+    
+    // Scroll to top of journal categories section
+    setTimeout(() => {
+      const journalSection = document.querySelector('.journal-selection');
+      if (journalSection) {
+        const navbarHeight = 120; // Account for fixed header/navbar
+        const elementPosition = journalSection.offsetTop - navbarHeight;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
   };
 
   const handleFileUpload = (file) => {
@@ -390,16 +462,29 @@ function PaperSubmissionPage() {
     }
 
     // Check file type
-    const allowedTypes = ['.pdf', '.doc', '.docx', '.txt'];
+    const allowedTypes = ['.doc', '.docx', '.txt'];
     const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
     if (!allowedTypes.includes(fileExtension)) {
-      setError('Please upload only PDF, DOC, DOCX, or TXT files');
+      setError('Please upload only , DOC, DOCX, or TXT files');
       return;
     }
 
     setUploadedFile(file);
     setError('');
-    console.log('File uploaded:', file.name, 'Size:', (file.size / 1024 / 1024).toFixed(2) + 'MB');
+    
+    // Scroll to submit section after file upload
+    setTimeout(() => {
+      const submitSection = document.querySelector('.submit-section');
+      if (submitSection) {
+        const navbarHeight = 120; // Account for fixed header/navbar
+        const elementPosition = submitSection.offsetTop - navbarHeight;
+        window.scrollTo({
+          top: elementPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+
   };
 
   const handleFileInputChange = (e) => {
@@ -441,17 +526,16 @@ function PaperSubmissionPage() {
     try {
       const userEmail = localStorage.getItem('userEmail');
       
-      // Prepare submission data
-      const submissionData = {
-        userEmail: userEmail,
-        journalName: selectedJournal.name,
-        journalIcon: selectedJournal.icon,
-        paperTitle: uploadedFile.name.replace(/\.[^/.]+$/, ""), // Remove file extension
-        fileName: uploadedFile.name
-      };
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('userEmail', userEmail);
+      formData.append('journalName', selectedJournal.name);
+      formData.append('journalIcon', selectedJournal.icon);
+      formData.append('paperTitle', uploadedFile.name.replace(/\.[^/.]+$/, "")); // Remove file extension
+      formData.append('paperFile', uploadedFile);
       
-      // Submit to backend
-      const response = await submitPaper(submissionData);
+      // Submit to backend with file
+      const response = await submitPaper(formData);
       
       if (response.success) {
         setSuccess('Paper submitted successfully! You will receive a confirmation email shortly.');
@@ -468,7 +552,6 @@ function PaperSubmissionPage() {
       }
       
     } catch (error) {
-      console.error('Submission error:', error);
       setError('Failed to submit paper. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -543,56 +626,115 @@ function PaperSubmissionPage() {
         </div>
       </div>
 
-      {/* File Upload */}
-      <div className="upload-section">
-        <h2 className="section-title">Upload Your Paper</h2>
-        <div
-          className={`upload-area ${isDragging ? 'dragover' : ''}`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={() => document.getElementById('file-input').click()}
-        >
-          <div className="upload-icon">📄</div>
-          <div className="upload-text">
-            {uploadedFile ? 'Click to change file' : 'Click to upload or drag and drop'}
-          </div>
-          <div className="upload-hint">
-            PDF, DOC, DOCX, or TXT files up to 10MB
-          </div>
-          <input
-            id="file-input"
-            type="file"
-            className="file-input"
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={handleFileInputChange}
-          />
-        </div>
-
-        {uploadedFile && (
-          <div className="file-info">
-            <div className="file-name">{uploadedFile.name}</div>
-            <div className="file-details">
-              Size: {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+      {/* File Upload - Only show after journal selection */}
+      {selectedJournal && (
+        <div className="upload-section" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
+          <h2 className="section-title">Upload Your Paper</h2>
+          <div style={{ 
+            background: '#f8f9ff', 
+            padding: '20px', 
+            borderRadius: '8px', 
+            marginBottom: '20px',
+            border: '1px solid #e0e7ff'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '1.5rem' }}>{selectedJournal.icon}</span>
+                <div>
+                  <div style={{ fontWeight: '600', color: '#1e3a8a' }}>Selected Journal:</div>
+                  <div style={{ color: '#4b5563' }}>{selectedJournal.name}</div>
+                </div>
+              </div>
+              <button
+                onClick={handleChangeJournal}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid #1e3a8a',
+                  color: '#1e3a8a',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = '#1e3a8a';
+                  e.target.style.color = 'white';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'transparent';
+                  e.target.style.color = '#1e3a8a';
+                }}
+              >
+                Change Journal
+              </button>
             </div>
           </div>
-        )}
-      </div>
+          
+          <div
+            className={`upload-area ${isDragging ? 'dragover' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-input').click()}
+          >
+            <div className="upload-icon">📄</div>
+            <div className="upload-text">
+              {uploadedFile ? 'Click to change file' : 'Click to upload or drag and drop'}
+            </div>
+            <div className="upload-hint">
+             DOC, DOCX, or TXT files up to 10MB
+            </div>
+            <input
+              id="file-input"
+              type="file"
+              className="file-input"
+              accept=".doc,.docx,.txt"
+              onChange={handleFileInputChange}
+            />
+          </div>
+
+          {uploadedFile && (
+            <div className="file-info">
+              <div className="file-name">{uploadedFile.name}</div>
+              <div className="file-details">
+                Size: {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Error/Success Messages */}
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
-      {/* Submit Button */}
-      <div className="submit-section">
-        <button
-          className="submit-button"
-          onClick={handleSubmit}
-          disabled={!selectedJournal || !uploadedFile || isSubmitting}
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit Paper'}
-        </button>
-      </div>
+      {/* Submit Button - Only show after file upload */}
+      {selectedJournal && uploadedFile && (
+        <div className="submit-section" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
+          <div style={{ 
+            background: '#f0f9ff', 
+            padding: '20px', 
+            borderRadius: '8px', 
+            marginBottom: '20px',
+            border: '1px solid #bae6fd'
+          }}>
+            <h3 style={{ color: '#0369a1', marginBottom: '10px' }}>Ready to Submit?</h3>
+            <p style={{ color: '#0c4a6e', margin: 0 }}>
+              Your paper <strong>"{uploadedFile.name}"</strong> will be submitted to <strong>{selectedJournal.name}</strong> for review.
+            </p>
+          </div>
+          
+          <button
+            className="submit-button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Paper'}
+          </button>
+        </div>
+      )}
 
       <style>
         {styles}

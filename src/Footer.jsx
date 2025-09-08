@@ -125,6 +125,7 @@ export default function Footer() {
               <li><Link to="/books" style={{ color: 'inherit', textDecoration: 'none' }}>Books</Link></li>
               <li><Link to="/platforms" style={{ color: 'inherit', textDecoration: 'none' }}>Platforms</Link></li>
               <li><Link to="/databases" style={{ color: 'inherit', textDecoration: 'none' }}>Databases</Link></li>
+              <li><Link to="/admin" style={{ color: 'inherit', textDecoration: 'none' }}>Admin</Link></li>
           </ul>
         </div>
 

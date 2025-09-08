@@ -5,6 +5,22 @@ export default function EducationJournal() {
   const [activeTab, setActiveTab] = useState('home');
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Reusable scroll function for anchor links
+  const scrollToSection = (sectionId, tabName = null) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const navbarHeight = 115; // Main header (70px) + navbar height + padding
+      const elementPosition = element.offsetTop - navbarHeight;
+      window.scrollTo({
+        top: elementPosition,
+        behavior: "smooth"
+      });
+    }                     
+    if (tabName) {
+      setActiveTab(tabName);
+    }
+  };
+
   const journalInfo = {
     about: [
       "The Lord Journal of Education (LJE) is a peer-reviewed, open-access international journal published by Lord-Tech Datus Sol Pvt. Ltd. It is devoted to advancing research and innovation in the field of education, serving as a dynamic platform for educators, researchers, policymakers, and practitioners.",
@@ -42,7 +58,22 @@ export default function EducationJournal() {
       const styleTag = document.createElement('style');
       styleTag.id = STYLE_ID;
       styleTag.innerHTML = `
-        .journal-page { min-height: 100vh; background-color: #f8f9fa; }
+        .journal-page {
+          min-height: 100vh;
+          background-color: #f8f9fa;
+          scroll-padding-top: 115px;
+        }
+
+        /* Global scroll behavior for anchor links */
+        html {
+          scroll-behavior: smooth;
+          scroll-padding-top: 115px;
+        }
+
+        /* Ensure all sections have proper scroll margin */
+        section[id] {
+          scroll-margin-top: 115px;
+        }
         .journal-header { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: white; padding: 60px 20px 40px; text-align: center; }
         .journal-title { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; margin-bottom: 1rem; }
         .journal-subtitle { font-size: clamp(1rem, 2vw, 1.2rem); opacity: 0.9; max-width: 800px; margin: 0 auto 0.5rem; font-weight: 600; }
@@ -51,18 +82,73 @@ export default function EducationJournal() {
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; gap: 2rem; align-items: center; }
         .nav-link { color: #0369a1; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; transition: all 0.2s ease; font-weight: 500; }
         .nav-link:hover, .nav-link.active { background: #e0f2fe; }
-        .main-content { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        .section-title { font-size: 1.8rem; font-weight: 700; color: #0369a1; margin-bottom: 1.5rem; }
-        .section-paragraph { color: #374151; line-height: 1.7; margin-bottom: 1rem; }
+        .main-content {
+          max-width: 1200px;
+          margin: 2rem auto;
+          padding: 0 1rem;
+          text-align: left;
+        }
+        .section-title {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: #0369a1;
+          margin-bottom: 1.5rem;
+          text-align: left;
+          scroll-margin-top: 115px;
+        }
+        .section-paragraph {
+          color: #374151;
+          line-height: 1.7;
+          margin-bottom: 1rem;
+          text-align: left;
+          max-width: 100%;
+        }
         .scope-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 1rem; margin-bottom: 3rem; }
-        .scope-item { background: white; padding: 1rem 1.25rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
-        .scope-title { font-weight: 600; color: #0369a1; margin-bottom: 0.5rem; }
-        .scope-description { color: #4b5563; font-size: 0.95rem; }
+        .scope-item {
+          background: white;
+          padding: 1rem 1.25rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+          text-align: left;
+        }
+        .scope-title {
+          font-weight: 600;
+          color: #0369a1;
+          margin-bottom: 0.5rem;
+          text-align: left;
+        }
+        .scope-description {
+          color: #4b5563;
+          font-size: 0.95rem;
+          text-align: left;
+          line-height: 1.5;
+        }
         .editorial-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-        .editor-card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .editor-name { font-size: 1.2rem; font-weight: 600; color: #0369a1; margin-bottom: 0.5rem; }
-        .editor-role { color: #4b5563; font-size: 0.9rem; margin-bottom: 0.5rem; }
-        .editor-affiliation { color: #6b7280; font-size: 0.9rem; }
+        .editor-card {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          text-align: left;
+        }
+        .editor-name {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #0369a1;
+          margin-bottom: 0.5rem;
+          text-align: left;
+        }
+        .editor-role {
+          color: #4b5563;
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+          text-align: left;
+        }
+        .editor-affiliation {
+          color: #6b7280;
+          font-size: 0.9rem;
+          text-align: left;
+        }
         .submit-button { display: inline-block; background: #0284c7; color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; font-weight: 600; transition: all 0.2s ease; margin-top: 2rem; }
         .submit-button:hover { background: #0369a1; transform: translateY(-2px); }
         @media (max-width: 1024px) {
@@ -80,14 +166,25 @@ export default function EducationJournal() {
           .nav-container { flex-direction: column; gap: 0.5rem; padding: 0 15px; align-items: stretch; }
           .nav-link { font-size: 0.8rem; padding: 0.5rem 0.75rem; text-align: center; border: 1px solid #e5e7eb; border-radius: 6px; }
           .main-content { margin: 1rem auto; padding: 0 15px; max-width: 100%; }
-          .section-title { font-size: 1.25rem; margin-bottom: 0.875rem; text-align: center; }
-          .section-paragraph { font-size: 0.85rem; line-height: 1.5; text-align: justify; }
+          .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.875rem;
+            text-align: left;
+          }
+          .section-paragraph {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            text-align: left;
+          }
           .scope-grid { grid-template-columns: 1fr; gap: 0.5rem; margin-bottom: 1.5rem; }
           .scope-item { padding: 0.75rem; }
           .scope-title { font-size: 0.9rem; margin-bottom: 0.375rem; }
           .scope-description { font-size: 0.8rem; line-height: 1.4; }
           .editorial-board { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
-          .editor-card { padding: 1rem; text-align: center; }
+          .editor-card {
+            padding: 1rem;
+            text-align: left;
+          }
           .editor-name { font-size: 1rem; }
           .editor-role { font-size: 0.8rem; }
           .editor-affiliation { font-size: 0.8rem; }
@@ -102,8 +199,16 @@ export default function EducationJournal() {
           .nav-container { padding: 0 10px; gap: 0.375rem; }
           .nav-link { font-size: 0.75rem; padding: 0.4rem 0.6rem; }
           .main-content { padding: 0 10px; margin: 0.75rem auto; }
-          .section-title { font-size: 1.1rem; margin-bottom: 0.75rem; }
-          .section-paragraph { font-size: 0.8rem; line-height: 1.4; }
+          .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            text-align: left;
+          }
+          .section-paragraph {
+            font-size: 0.8rem;
+            line-height: 1.4;
+            text-align: left;
+          }
           .scope-item { padding: 0.6rem; }
           .scope-title { font-size: 0.85rem; margin-bottom: 0.25rem; }
           .scope-description { font-size: 0.75rem; line-height: 1.3; }
@@ -132,13 +237,38 @@ export default function EducationJournal() {
             <span role="img" aria-label="home">🏠</span> Home
           </Link>
           <a
+            href="#about-us"
+            className={'nav-link' + (activeTab === 'about' ? ' active' : '')}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('about-us', 'about');
+            }}
+          >
+            About Us
+          </a>
+          <a
             href="#editorial-board"
             className={'nav-link' + (activeTab === 'editorial' ? ' active' : '')}
-            onClick={() => setActiveTab('editorial')}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('editorial-board', 'editorial');
+            }}
           >
             Editorial Board
           </a>
-          <Link to="/login" className="nav-link">Login</Link>
+          <a
+            href="#aim-and-scope"
+            className={'nav-link' + (activeTab === 'scope' ? ' active' : '')}
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('aim-and-scope', 'scope');
+            }}
+          >
+            Aim & Scope
+          </a>
+          <Link to="/submit" className="nav-link">
+            Submit Paper
+          </Link>
         </div>
       </nav>
 

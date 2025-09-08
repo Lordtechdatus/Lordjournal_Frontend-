@@ -7,7 +7,7 @@ const TOKEN_STORAGE_KEY = 'adminAuthToken';
 // API helper functions
 async function makeRequest(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
-  console.log('Making request to:', url); // Debug log
+  
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -64,10 +64,26 @@ export async function getUserProfile(email) {
 }
 
 export async function submitPaper(submissionData) {
-  return makeRequest('/registration/submit-paper', {
-    method: 'POST',
-    body: JSON.stringify(submissionData)
-  });
+  // Check if submissionData is FormData (file upload) or regular object
+  if (submissionData instanceof FormData) {
+    // For file uploads, don't set Content-Type header, let browser set it with boundary
+    const response = await fetch(`${API_BASE}/registration/submit-paper`, {
+      method: 'POST',
+      body: submissionData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    return response.json();
+  } else {
+    // For regular JSON submissions
+    return makeRequest('/registration/submit-paper', {
+      method: 'POST',
+      body: JSON.stringify(submissionData)
+    });
+  }
 }
 
 export async function updateProfile(profileData) {
@@ -90,6 +106,56 @@ export function getAuthToken() {
 
 export function clearAuthToken() {
   localStorage.removeItem(TOKEN_STORAGE_KEY);
+}
+
+// Admin API functions
+export async function fetchAdminSubmissions(filters = {}) {
+  const authToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+  const queryParams = new URLSearchParams(filters);
+  
+  return makeRequest(`/admin/submissions?${queryParams}`, {
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    }
+  });
+}
+
+export async function updateSubmissionStatus(submissionId, status) {
+  const authToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+  
+  return makeRequest(`/admin/submissions/${submissionId}/status`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    },
+    body: JSON.stringify({ status })
+  });
+}
+
+export async function downloadSubmissionFile(submissionId) {
+  const authToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+  
+  const response = await fetch(`/api/admin/submissions/${submissionId}/download`, {
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+  
+  return response.blob();
+}
+
+export async function fetchDashboardStats() {
+  const authToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+  
+  return makeRequest('/admin/dashboard/stats', {
+    headers: {
+      'Authorization': `Bearer ${authToken}`
+    }
+  });
 }
 
 // Connection Test Component

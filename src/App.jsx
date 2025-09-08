@@ -24,6 +24,8 @@ import BooksPage from "./BooksPage";
 import DatabasesPage from "./DatabasesPage";
 import PlatformsPage from "./PlatformsPage";
 import ConnectionTest from "../server/FetchNodeAdmin";
+import AdminDashboard from "./AdminDashboard";
+import AdminLogin from "./AdminLogin";
 
 
 const APP_STYLE_ID = "app-inline-style";
@@ -168,6 +170,17 @@ function App() {
           <PlatformsPage />
         </Layout>
       } />
+      <Route path="/admin" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <AdminDashboard />
+        </Layout>
+      } />
+      <Route path="/admin-login" element={
+        <Layout currentPage={currentPage} onNavigate={navigateTo}>
+          <AdminLogin />
+        </Layout>
+      } />
+
       <Route path="/test-connection" element={
         <Layout currentPage={currentPage} onNavigate={navigateTo}>
           <ConnectionTest />

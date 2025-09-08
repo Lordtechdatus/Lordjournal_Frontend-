@@ -1,0 +1,19 @@
+This is a test paper submission for testing the admin dashboard.
+
+Paper Title: Test Research Paper on Machine Learning
+Author: Admin User
+Journal: Test Journal of Computer Science
+Date: 2025-09-02T08:18:31.768Z
+
+Abstract:
+This is a sample research paper to test the file download functionality in the admin dashboard. 
+The paper discusses various machine learning algorithms and their applications in modern computing.
+
+Keywords: machine learning, artificial intelligence, research, test
+
+Content:
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Conclusion:
+This test paper demonstrates that the file upload and download system is working correctly.

@@ -715,9 +715,9 @@ function HeroSection() {
             ))}
           </div>
         )}
-        <a href="#services" className="advanced-search">
+        {/* <a href="#services" className="advanced-search">
           Advanced search options →
-        </a>
+        </a> */}
       </div>
     </section>
   );

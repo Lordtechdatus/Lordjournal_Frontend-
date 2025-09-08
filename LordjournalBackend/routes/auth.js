@@ -67,8 +67,6 @@ router.post('/register', validateRegistration, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Registration error:', error);
-    
     if (error.message === 'User already exists with this email') {
       return res.status(409).json({ error: error.message });
     }
@@ -77,7 +75,7 @@ router.post('/register', validateRegistration, async (req, res) => {
   }
 });
 
-// User login
+//user login validation and authentication 
 router.post('/login', validateLogin, async (req, res) => {
   try {
     // Check for validation errors
@@ -113,7 +111,6 @@ router.post('/login', validateLogin, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({ error: 'Server error during login' });
   }
 });
@@ -132,7 +129,6 @@ router.get('/me', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Profile fetch error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -148,7 +144,6 @@ router.post('/refresh', authenticateToken, async (req, res) => {
       token
     });
   } catch (error) {
-    console.error('Token refresh error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -163,7 +158,6 @@ router.post('/logout', authenticateToken, async (req, res) => {
       message: 'Logged out successfully'
     });
   } catch (error) {
-    console.error('Logout error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

@@ -600,12 +600,12 @@ function UserProfile() {
         return;
       }
       
-      console.log('Fetching profile for:', userEmail);
+  
       
       // Call the real API to get user profile
       const response = await getUserProfile(userEmail);
       
-      console.log('Profile API response:', response);
+      
       
       if (response.success && response.user) {
         setUserProfile(response.user);
@@ -615,7 +615,6 @@ function UserProfile() {
       
       setIsLoading(false);
     } catch (error) {
-      console.error('Error loading profile:', error);
       setError('Failed to connect to server. Please try again.');
       setIsLoading(false);
     }
@@ -733,7 +732,6 @@ function UserProfile() {
       }
       
     } catch (error) {
-      console.error('Error updating profile:', error);
       alert('Failed to update profile. Please try again.');
     }
   };

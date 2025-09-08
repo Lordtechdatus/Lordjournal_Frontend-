@@ -47,7 +47,6 @@ router.get('/profile', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Profile fetch error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -97,8 +96,6 @@ router.put('/profile', authenticateToken, validateProfileUpdate, async (req, res
     });
 
   } catch (error) {
-    console.error('Profile update error:', error);
-    
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(409).json({ error: 'Email already exists' });
     }
@@ -133,8 +130,6 @@ router.put('/password', authenticateToken, validatePasswordChange, async (req, r
     });
 
   } catch (error) {
-    console.error('Password change error:', error);
-    
     if (error.message === 'Current password is incorrect') {
       return res.status(400).json({ error: error.message });
     }
@@ -158,7 +153,6 @@ router.delete('/account', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Account deletion error:', error);
     res.status(500).json({ error: 'Server error during account deletion' });
   }
 });
@@ -196,7 +190,6 @@ router.get('/:id', authenticateToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('User fetch error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

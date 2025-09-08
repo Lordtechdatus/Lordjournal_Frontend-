@@ -150,7 +150,6 @@ const CookieConsent = () => {
       setSessionCookie("sessionId", sessionId);
       
     } catch (error) {
-      console.error('Error recording cookie consent:', error);
       // Don't block the user experience if backend fails
     }
   };

@@ -313,7 +313,6 @@ function LoginPage({ onNavigate }) {
         }
       }
     } catch (error) {
-      console.error('Login error:', error);
       alert('Connection failed. Please try again.');
     } finally {
       setIsLoading(false);
