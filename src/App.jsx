@@ -26,6 +26,7 @@ import PlatformsPage from "./PlatformsPage";
 import ConnectionTest from "../server/FetchNodeAdmin";
 import AdminDashboard from "./AdminDashboard";
 import AdminLogin from "./AdminLogin";
+import { WebSocketProvider } from "./contexts/WebSocketContext";
 
 
 const APP_STYLE_ID = "app-inline-style";
@@ -70,131 +71,131 @@ function App() {
   };
 
   return (
-    <>
-    <Routes>
-      <Route path="/" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <Homepage />
-        </Layout>
-      } />
-      <Route path="/login" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <LoginPage onNavigate={navigateTo} />
-        </Layout>
-      } />
-      <Route path="/register" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <RegisterPage />
-        </Layout>
-      } />
-      <Route path="/profile" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <UserProfile />
-        </Layout>
-      } />
-      <Route path="/submit" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <PaperSubmissionPage />
-        </Layout>
-      } />
-      <Route path="/journals/civil-engineering" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <CivilEngineeringJournal />
-        </Layout>
-      } />
-      <Route path="/journals/mechanical-engineering" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <MechanicalEngineeringJournal />
-        </Layout>
-      } />
-      <Route path="/journals/electronics-engineering" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <ElectronicsEngineeringJournal />
-        </Layout>
-      } />
-      <Route path="/journals/electrical-engineering" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <ElectricalEngineeringJournal />
-        </Layout>
-      } />
-      <Route path="/journals/computer-science-engineering" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <ComputerScienceEngineeringJournal />
-        </Layout>
-      } />
-      <Route path="/journals/applied-science" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <AppliedScienceJournal />
-        </Layout>
-      } />
-      <Route path="/journals/ai-ml-data-science" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <AIMLDSJournal />
-        </Layout>
-      } />
-      <Route path="/journals/law-social-science" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <LawSocialScienceJournal />
-        </Layout>
-      } />
-      <Route path="/journals/education" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <EducationJournal />
-        </Layout>
-      } />
-      <Route path="/journals/management" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <ManagementJournal />
-        </Layout>
-      } />
-      <Route path="/footer" element={
-        <Footer />
-      } />
-      <Route path="/journals" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <JournalsPage />
-        </Layout>
-      } />
-      <Route path="/books" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <BooksPage />
-        </Layout>
-      } />
-      <Route path="/databases" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <DatabasesPage />
-        </Layout>
-      } />
-      <Route path="/platforms" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <PlatformsPage />
-        </Layout>
-      } />
-      <Route path="/admin" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <AdminDashboard />
-        </Layout>
-      } />
-      <Route path="/admin-login" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <AdminLogin />
-        </Layout>
-      } />
+    <WebSocketProvider>
+      <Routes>
+        <Route path="/" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <Homepage />
+          </Layout>
+        } />
+        <Route path="/login" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <LoginPage onNavigate={navigateTo} />
+          </Layout>
+        } />
+        <Route path="/register" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <RegisterPage />
+          </Layout>
+        } />
+        <Route path="/profile" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <UserProfile />
+          </Layout>
+        } />
+        <Route path="/submit" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <PaperSubmissionPage />
+          </Layout>
+        } />
+        <Route path="/journals/civil-engineering" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <CivilEngineeringJournal />
+          </Layout>
+        } />
+        <Route path="/journals/mechanical-engineering" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <MechanicalEngineeringJournal />
+          </Layout>
+        } />
+        <Route path="/journals/electronics-engineering" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <ElectronicsEngineeringJournal />
+          </Layout>
+        } />
+        <Route path="/journals/electrical-engineering" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <ElectricalEngineeringJournal />
+          </Layout>
+        } />
+        <Route path="/journals/computer-science-engineering" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <ComputerScienceEngineeringJournal />
+          </Layout>
+        } />
+        <Route path="/journals/applied-science" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <AppliedScienceJournal />
+          </Layout>
+        } />
+        <Route path="/journals/ai-ml-data-science" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <AIMLDSJournal />
+          </Layout>
+        } />
+        <Route path="/journals/law-social-science" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <LawSocialScienceJournal />
+          </Layout>
+        } />
+        <Route path="/journals/education" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <EducationJournal />
+          </Layout>
+        } />
+        <Route path="/journals/management" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <ManagementJournal />
+          </Layout>
+        } />
+        <Route path="/footer" element={
+          <Footer />
+        } />
+        <Route path="/journals" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <JournalsPage />
+          </Layout>
+        } />
+        <Route path="/books" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <BooksPage />
+          </Layout>
+        } />
+        <Route path="/databases" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <DatabasesPage />
+          </Layout>
+        } />
+        <Route path="/platforms" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <PlatformsPage />
+          </Layout>
+        } />
+        <Route path="/admin" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <AdminDashboard />
+          </Layout>
+        } />
+        <Route path="/admin-login" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <AdminLogin />
+          </Layout>
+        } />
 
-      <Route path="/test-connection" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <ConnectionTest />
-        </Layout>
-      } />
-      <Route path="/privacy" element={
-        <Layout currentPage={currentPage} onNavigate={navigateTo}>
-          <PrivacyPolicy />
-        </Layout>
-      } />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-    <CookieConsent />
-  </>
+        <Route path="/test-connection" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <ConnectionTest />
+          </Layout>
+        } />
+        <Route path="/privacy" element={
+          <Layout currentPage={currentPage} onNavigate={navigateTo}>
+            <PrivacyPolicy />
+          </Layout>
+        } />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <CookieConsent />
+    </WebSocketProvider>
   );
 }
 

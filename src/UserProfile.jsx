@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUserProfile, clearAuthToken, updateProfile } from '../server/FetchNodeAdmin';
 import InstitutionField from './components/InstitutionField';
+import { useWebSocket } from './contexts/WebSocketContext';
 
 const PROFILE_STYLE_ID = 'profile-inline-styles';
 
@@ -224,6 +225,78 @@ const styles = `
   box-shadow: 0 4px 15px rgba(0, 82, 204, 0.1);
 }
 
+.individual-submissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.individual-submission-card {
+  background: #f8fafc;
+  border: 1px solid #e1e5ee;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.individual-submission-card:hover {
+  border-color: #0052cc;
+  box-shadow: 0 4px 15px rgba(0, 82, 204, 0.1);
+}
+
+.individual-submission-card.highlighted {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  background: #f0fdf4;
+  animation: highlightPulse 2s ease-in-out;
+}
+
+@keyframes highlightPulse {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.1);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+}
+
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.submission-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.submission-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.submission-date {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.submission-updated {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
+
 .submission-journal {
   display: flex;
   align-items: center;
@@ -285,6 +358,16 @@ const styles = `
 .status-badge.submitted {
   background: #dbeafe;
   color: #1e40af;
+}
+
+.status-badge.accepted {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.rejected {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 .no-submissions {
@@ -552,10 +635,22 @@ const styles = `
   .save-btn {
     width: 100%;
   }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }`;
 
 function UserProfile() {
   const navigate = useNavigate();
+  const { joinUserRoom, onSubmissionStatusUpdate, offSubmissionStatusUpdate, isConnected, usePolling } = useWebSocket();
   const [userProfile, setUserProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -569,6 +664,8 @@ function UserProfile() {
     new_password: '',
     confirm_password: ''
   });
+  const [statusUpdateNotification, setStatusUpdateNotification] = useState(null);
+  const [highlightedSubmission, setHighlightedSubmission] = useState(null);
 
   useEffect(() => {
     // Check if user is logged in
@@ -581,6 +678,65 @@ function UserProfile() {
     // Get user profile
     loadUserProfile();
   }, [navigate]);
+
+  // WebSocket event handling
+  useEffect(() => {
+    if (userProfile && userProfile.email) {
+      // Join user room for real-time updates
+      joinUserRoom(userProfile.email);
+    }
+  }, [userProfile, joinUserRoom]);
+
+  // Listen for submission status updates
+  useEffect(() => {
+    const handleStatusUpdate = (data) => {
+      console.log('Received status update:', data);
+      
+      // Determine notification type based on status
+      let notificationType = 'success';
+      let statusDisplay = data.status.replace('_', ' ').toUpperCase();
+      
+      if (data.status === 'rejected') {
+        notificationType = 'error';
+      } else if (data.status === 'accepted' || data.status === 'published') {
+        notificationType = 'success';
+      } else if (data.status === 'under_review') {
+        notificationType = 'info';
+      }
+      
+      // Show notification with more details
+      setStatusUpdateNotification({
+        type: notificationType,
+        message: `Your paper "${data.paperTitle}" in ${data.journalName} has been updated to ${statusDisplay}`,
+        timestamp: new Date().toISOString(),
+        paperTitle: data.paperTitle,
+        journalName: data.journalName,
+        status: data.status
+      });
+
+      // Highlight the updated submission
+      setHighlightedSubmission(data.id);
+
+      // Refresh user profile data
+      loadUserProfile();
+
+      // Auto-hide notification after 7 seconds for better readability
+      setTimeout(() => {
+        setStatusUpdateNotification(null);
+      }, 7000);
+
+      // Remove highlight after 5 seconds
+      setTimeout(() => {
+        setHighlightedSubmission(null);
+      }, 5000);
+    };
+
+    onSubmissionStatusUpdate(handleStatusUpdate);
+
+    return () => {
+      offSubmissionStatusUpdate(handleStatusUpdate);
+    };
+  }, [onSubmissionStatusUpdate, offSubmissionStatusUpdate]);
 
   const loadUserProfile = async () => {
     try {
@@ -812,6 +968,66 @@ function UserProfile() {
         Welcome back! Here's your account overview
       </p>
 
+      {/* Connection Status */}
+      {!isConnected && (
+        <div style={{
+          background: usePolling ? '#dbeafe' : '#fef3c7',
+          color: usePolling ? '#1e40af' : '#92400e',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          margin: '0 auto 20px',
+          maxWidth: '600px',
+          textAlign: 'center',
+          fontSize: '0.9rem'
+        }}>
+          {usePolling ? (
+            <>🔄 Using polling for updates (every 30 seconds). Real-time updates are not available.</>
+          ) : (
+            <>⚠️ Real-time updates are not available. Some features may not work properly.</>
+          )}
+        </div>
+      )}
+
+      {/* Status Update Notification */}
+      {statusUpdateNotification && (
+        <div style={{
+          background: statusUpdateNotification.type === 'success' ? '#d1fae5' : 
+                     statusUpdateNotification.type === 'error' ? '#fee2e2' : '#dbeafe',
+          color: statusUpdateNotification.type === 'success' ? '#065f46' : 
+                 statusUpdateNotification.type === 'error' ? '#dc2626' : '#1e40af',
+          padding: '15px 20px',
+          borderRadius: '8px',
+          margin: '0 auto 20px',
+          maxWidth: '600px',
+          textAlign: 'center',
+          fontSize: '0.9rem',
+          border: `1px solid ${statusUpdateNotification.type === 'success' ? '#a7f3d0' : 
+                   statusUpdateNotification.type === 'error' ? '#fecaca' : '#93c5fd'}`,
+          animation: 'slideDown 0.3s ease-out',
+          position: 'relative'
+        }}>
+          <button
+            onClick={() => setStatusUpdateNotification(null)}
+            style={{
+              position: 'absolute',
+              top: '5px',
+              right: '10px',
+              background: 'none',
+              border: 'none',
+              fontSize: '1.2rem',
+              cursor: 'pointer',
+              color: 'inherit',
+              opacity: 0.7
+            }}
+            title="Close notification"
+          >
+            ×
+          </button>
+          {statusUpdateNotification.type === 'success' ? '✅' : 
+           statusUpdateNotification.type === 'error' ? '❌' : 'ℹ️'} {statusUpdateNotification.message}
+        </div>
+      )}
+
       <div className="profile-content">
         {/* Left Sidebar */}
         <div className="profile-sidebar">
@@ -929,29 +1145,45 @@ function UserProfile() {
             </div>
           </div>
 
-          {/* Journal Submissions */}
+          {/* Individual Paper Submissions */}
           <div className="profile-section">
-            <h3>📚 Journal Submissions</h3>
+            <h3>📚 Your Paper Submissions</h3>
             
             <div className="journal-submissions">
-              {userProfile.journal_submissions && userProfile.journal_submissions.length > 0 ? (
-                <div className="submission-grid">
-                  {userProfile.journal_submissions.map((submission, index) => (
-                    <div key={index} className="submission-card">
-                      <div className="submission-journal">
-                        <div className="journal-icon">{submission.icon}</div>
-                        <div className="journal-name">{submission.journal_name}</div>
+              {userProfile.individual_submissions && userProfile.individual_submissions.length > 0 ? (
+                <div className="individual-submissions-list">
+                  {userProfile.individual_submissions.map((submission, index) => (
+                    <div 
+                      key={submission.id || index} 
+                      className={`individual-submission-card ${highlightedSubmission === submission.id ? 'highlighted' : ''}`}
+                    >
+                      <div className="submission-header">
+                        <div className="submission-journal">
+                          <div className="journal-icon">{submission.journal_icon}</div>
+                          <div className="journal-name">{submission.journal_name}</div>
+                        </div>
+                        <div className="submission-date">
+                          Submitted: {formatDate(submission.submission_date)}
+                        </div>
                       </div>
-                      <div className="submission-count">
-                        <div className="count-number">{submission.count}</div>
-                        <div className="count-label">Papers</div>
+                      <div className="submission-title">
+                        {submission.paper_title}
                       </div>
-                      <div className="submission-status">
-                        <span className={`status-badge ${submission.status}`}>
-                          {submission.status === 'published' ? '✅ Published' : 
-                           submission.status === 'under_review' ? '⏳ Under Review' : 
-                           '📝 Submitted'}
-                        </span>
+                      <div className="submission-footer">
+                        <div className="submission-status">
+                          <span className={`status-badge ${submission.status}`}>
+                            {submission.status === 'published' ? '✅ Published' : 
+                             submission.status === 'under_review' ? '⏳ Under Review' : 
+                             submission.status === 'accepted' ? '✅ Accepted' :
+                             submission.status === 'rejected' ? '❌ Rejected' :
+                             '📝 Submitted'}
+                          </span>
+                        </div>
+                        {submission.updated_at && submission.updated_at !== submission.submission_date && (
+                          <div className="submission-updated">
+                            Updated: {formatDate(submission.updated_at)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

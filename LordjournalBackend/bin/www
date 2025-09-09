@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('lordjournalbackend:server');
 var http = require('http');
+var { initializeWebSocket } = require('../websocket');
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +21,9 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+
+// Initialize WebSocket
+initializeWebSocket(server);
 
 /**
  * Listen on provided port, on all network interfaces.

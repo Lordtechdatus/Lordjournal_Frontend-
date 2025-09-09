@@ -318,21 +318,34 @@ router.get('/profile/:email', async (req, res) => {
 
     const user = users[0];
 
-    // Get journal submissions data (after we confirm user exists)
+    // Get individual paper submissions data (after we confirm user exists)
     const [submissions] = await connection.execute(
       `SELECT 
+        id,
         journal_name, 
         journal_icon,
-        COUNT(*) as count,
-        status
+        paper_title,
+        status,
+        submission_date,
+        updated_at
       FROM user_submissions 
       WHERE user_id = ? 
-      GROUP BY journal_name, status
-      ORDER BY journal_name`,
+      ORDER BY submission_date DESC`,
       [user.id]
     );
 
-    // Process journal submissions data
+    // Process individual submissions data
+    const individualSubmissions = submissions.map(submission => ({
+      id: submission.id,
+      journal_name: submission.journal_name,
+      journal_icon: submission.journal_icon || '📄',
+      paper_title: submission.paper_title,
+      status: submission.status,
+      submission_date: submission.submission_date,
+      updated_at: submission.updated_at
+    }));
+
+    // Also create aggregated data for backward compatibility
     const journalSubmissions = [];
     const journalMap = new Map();
 
@@ -346,7 +359,7 @@ router.get('/profile/:email', async (req, res) => {
           status: submission.status
         });
       }
-      journalMap.get(key).count += submission.count;
+      journalMap.get(key).count += 1;
     });
 
     journalMap.forEach(submission => {
@@ -354,13 +367,13 @@ router.get('/profile/:email', async (req, res) => {
     });
 
     // Calculate stats
-    const totalPapers = submissions.reduce((sum, sub) => sum + sub.count, 0);
+    const totalPapers = submissions.length;
     const published = submissions
       .filter(sub => sub.status === 'published')
-      .reduce((sum, sub) => sum + sub.count, 0);
+      .length;
     const underReview = submissions
       .filter(sub => sub.status === 'under_review')
-      .reduce((sum, sub) => sum + sub.count, 0);
+      .length;
 
     // Format the response
     const userProfile = {
@@ -382,7 +395,8 @@ router.get('/profile/:email', async (req, res) => {
         under_review: underReview,
         citations: 0 // You can add citations tracking later
       },
-      journal_submissions: journalSubmissions
+      journal_submissions: journalSubmissions,
+      individual_submissions: individualSubmissions
     };
 
     res.json({

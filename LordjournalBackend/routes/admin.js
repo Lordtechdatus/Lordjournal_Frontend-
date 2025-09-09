@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require('./pool');
 const path = require('path');
 const fs = require('fs').promises;
+const { emitStatusUpdate, emitStatusUpdateToAdmins } = require('../websocket');
 
 // Admin authentication middleware - check if user is admin
 const requireAdmin = async (req, res, next) => {
@@ -210,6 +211,25 @@ router.put('/submissions/:id/status', requireAdmin, async (req, res) => {
       });
     }
     
+    // First, get the submission details before updating
+    const [submissionDetails] = await connection.execute(
+      `SELECT us.id, us.paper_title, us.journal_name, us.status, u.email as author_email
+       FROM user_submissions us
+       JOIN users u ON us.user_id = u.id
+       WHERE us.id = ?`,
+      [id]
+    );
+    
+    if (submissionDetails.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Submission not found'
+      });
+    }
+    
+    const submission = submissionDetails[0];
+    
+    // Update the status
     const [result] = await connection.execute(
       'UPDATE user_submissions SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
       [status, id]
@@ -222,12 +242,29 @@ router.put('/submissions/:id/status', requireAdmin, async (req, res) => {
       });
     }
     
+    // Emit WebSocket events for real-time updates
+    const submissionData = {
+      id: submission.id,
+      status: status,
+      paperTitle: submission.paper_title,
+      journalName: submission.journal_name,
+      authorEmail: submission.author_email,
+      updatedAt: new Date().toISOString()
+    };
+    
+    // Emit to the specific user
+    emitStatusUpdate(submission.author_email, submissionData);
+    
+    // Emit to all admins
+    emitStatusUpdateToAdmins(submissionData);
+    
     res.json({
       success: true,
       message: 'Status updated successfully'
     });
     
   } catch (error) {
+    console.error('Error updating submission status:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error while updating status'

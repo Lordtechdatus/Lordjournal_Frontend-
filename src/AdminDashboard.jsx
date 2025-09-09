@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLogin } from '../server/FetchNodeAdmin';
+import { useWebSocket } from './contexts/WebSocketContext';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { joinAdminRoom, onSubmissionStatusUpdate, offSubmissionStatusUpdate, isConnected, usePolling } = useWebSocket();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [submissions, setSubmissions] = useState([]);
@@ -34,6 +36,7 @@ const AdminDashboard = () => {
   const [isLoadingSubmissions, setIsLoadingSubmissions] = useState(false);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
   const [error, setError] = useState('');
+  const [statusUpdateNotification, setStatusUpdateNotification] = useState(null);
 
   // Check authentication on component mount
   useEffect(() => {
@@ -67,6 +70,45 @@ const AdminDashboard = () => {
       fetchDashboardStats();
     }
   }, [isAuthenticated]);
+
+  // WebSocket event handling
+  useEffect(() => {
+    if (isAuthenticated) {
+      const adminEmail = localStorage.getItem('userEmail');
+      if (adminEmail) {
+        joinAdminRoom(adminEmail);
+      }
+    }
+  }, [isAuthenticated, joinAdminRoom]);
+
+  // Listen for submission status updates from other admins
+  useEffect(() => {
+    const handleStatusUpdate = (data) => {
+      console.log('Received status update from another admin:', data);
+      
+      // Show notification
+      setStatusUpdateNotification({
+        type: 'info',
+        message: `Another admin updated "${data.paperTitle}" status to ${data.status.replace('_', ' ')}`,
+        timestamp: new Date().toISOString()
+      });
+
+      // Refresh submissions and stats
+      fetchSubmissions();
+      fetchDashboardStats();
+
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => {
+        setStatusUpdateNotification(null);
+      }, 5000);
+    };
+
+    onSubmissionStatusUpdate(handleStatusUpdate);
+
+    return () => {
+      offSubmissionStatusUpdate(handleStatusUpdate);
+    };
+  }, [onSubmissionStatusUpdate, offSubmissionStatusUpdate]);
 
   const fetchSubmissions = async () => {
     setIsLoadingSubmissions(true);
@@ -270,6 +312,44 @@ const AdminDashboard = () => {
         <h1>Admin Dashboard</h1>
         <p>Manage paper submissions and review process</p>
       </div>
+
+      {/* Connection Status */}
+      {!isConnected && (
+        <div style={{
+          background: usePolling ? '#dbeafe' : '#fef3c7',
+          color: usePolling ? '#1e40af' : '#92400e',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          margin: '0 auto 20px',
+          maxWidth: '1200px',
+          textAlign: 'center',
+          fontSize: '0.9rem'
+        }}>
+          {usePolling ? (
+            <>🔄 Using polling for updates (every 30 seconds). Real-time updates are not available.</>
+          ) : (
+            <>⚠️ Real-time updates are not available. Some features may not work properly.</>
+          )}
+        </div>
+      )}
+
+      {/* Status Update Notification */}
+      {statusUpdateNotification && (
+        <div style={{
+          background: statusUpdateNotification.type === 'info' ? '#dbeafe' : '#fee2e2',
+          color: statusUpdateNotification.type === 'info' ? '#1e40af' : '#dc2626',
+          padding: '15px 20px',
+          borderRadius: '8px',
+          margin: '0 auto 20px',
+          maxWidth: '1200px',
+          textAlign: 'center',
+          fontSize: '0.9rem',
+          border: `1px solid ${statusUpdateNotification.type === 'info' ? '#93c5fd' : '#fecaca'}`,
+          animation: 'slideDown 0.3s ease-out'
+        }}>
+          ℹ️ {statusUpdateNotification.message}
+        </div>
+      )}
 
       {/* Dashboard Stats */}
       <div className="stats-grid">
@@ -887,6 +967,17 @@ const AdminDashboard = () => {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         @media (max-width: 768px) {
