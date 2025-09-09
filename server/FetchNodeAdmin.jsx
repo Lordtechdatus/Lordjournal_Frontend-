@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 // Simple API client for Node admin backend
-const API_BASE = '/api'; // Add /api prefix to match backend routes
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'; // Use environment variable or fallback to /api
 const TOKEN_STORAGE_KEY = 'adminAuthToken';
 
 // API helper functions
@@ -173,7 +173,7 @@ export default function ConnectionTest() {
       setDetail(`API Base: ${API_BASE}\nResponse: ${JSON.stringify(res, null, 2)}`);
     } catch (err) {
       setStatus('❌ Connection Failed');
-      setDetail(`Error: ${err.message}\n\nMake sure your backend is running on http://localhost:3000`);
+      setDetail(`Error: ${err.message}\n\nMake sure your backend is running on ${API_BASE}`);
     }
   };
 
