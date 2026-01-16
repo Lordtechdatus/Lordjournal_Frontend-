@@ -83,7 +83,6 @@ const AdminLogin = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@lordjournal.com"
               required
               className="form-input"
             />
@@ -96,7 +95,6 @@ const AdminLogin = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
               required
               className="form-input"
             />

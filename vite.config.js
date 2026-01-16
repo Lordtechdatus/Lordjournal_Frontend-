@@ -28,10 +28,10 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://168.231.123.190/api',
+        //target: 'http://168.231.123.190/api',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
       },
     }
   }

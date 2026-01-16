@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
 // Simple API client for Node admin backend
-const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'; // Use environment variable or fallback to /api
+// Auto-detect environment and use appropriate API base URL
+const isProduction = import.meta.env.PROD || window.location.hostname !== 'localhost';
+const API_BASE = isProduction 
+  ? '/api'  // Production: use proxy from vite.config.js
+  : 'http://localhost:3000/api';  // Local: connect directly to backend
 const TOKEN_STORAGE_KEY = 'adminAuthToken';
 
 // API helper functions

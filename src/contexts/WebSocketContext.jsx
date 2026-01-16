@@ -18,10 +18,20 @@ export const WebSocketProvider = ({ children }) => {
   const [usePolling, setUsePolling] = useState(false);
 
   useEffect(() => {
-    // Initialize socket connection
-    const newSocket = io(process.env.NODE_ENV === 'production' 
-      ? 'https://your-backend-domain.com' 
-      : 'http://localhost:3000', {
+    // Auto-detect environment and use appropriate WebSocket URL
+    const isProd = import.meta?.env?.PROD || window.location.hostname !== 'localhost';
+    
+    // If PROD: connect to the SAME ORIGIN (Nginx will proxy to Node)
+    // If DEV: connect directly to your backend dev server
+    const WS_URL = isProd
+      ? undefined  // same-origin (will use current domain)
+      : 'http://localhost:3000';  // dev: connect directly to backend
+
+    const newSocket = io(WS_URL, {
+      // IMPORTANT: this must match your Nginx location block
+      path: '/socket.io/',
+      withCredentials: true,
+      transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
       reconnectionDelay: 1000,
@@ -30,26 +40,19 @@ export const WebSocketProvider = ({ children }) => {
     });
 
     newSocket.on('connect', () => {
-      console.log('WebSocket connected:', newSocket.id);
       setIsConnected(true);
       setUsePolling(false);
-      // Stop polling if WebSocket connects
       pollingService.stopAllPolling();
     });
 
-    newSocket.on('disconnect', () => {
-      console.log('WebSocket disconnected');
-      setIsConnected(false);
-    });
+    newSocket.on('disconnect', () => setIsConnected(false));
 
-    newSocket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error);
+    newSocket.on('connect_error', () => {
       setIsConnected(false);
       setUsePolling(true);
     });
 
     setSocket(newSocket);
-
     return () => {
       newSocket.close();
       pollingService.stopAllPolling();
@@ -65,7 +68,7 @@ export const WebSocketProvider = ({ children }) => {
     if (usePolling && userEmail) {
       pollingService.startUserPolling(userEmail, (userData) => {
         // This will be handled by the component that calls this
-        console.log('Polling received user data:', userData);
+      //  console.log('Polling received user data:', userData);
       });
     }
   };
@@ -79,7 +82,7 @@ export const WebSocketProvider = ({ children }) => {
     if (usePolling && adminEmail) {
       pollingService.startAdminPolling(adminEmail, (adminData) => {
         // This will be handled by the component that calls this
-        console.log('Polling received admin data:', adminData);
+      //  console.log('Polling received admin data:', adminData);
       });
     }
   };
